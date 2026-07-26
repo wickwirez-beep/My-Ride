@@ -38,10 +38,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                 .padding(padding)
                 .padding(20.dp)
         ) {
-            Text("Claude API Key", style = MaterialTheme.typography.titleMedium)
+            Text("Gemini API Key", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Used for the AI Assistant on each vehicle. Stored encrypted on this device only.",
+                "Used for the AI Assistant on each vehicle. Get a free key at " +
+                    "aistudio.google.com/apikey — no credit card needed. " +
+                    "Stored encrypted on this device only.",
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(16.dp))

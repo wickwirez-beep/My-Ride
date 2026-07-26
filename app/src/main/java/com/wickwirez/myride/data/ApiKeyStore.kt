@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-// Stores the user's own Anthropic API key encrypted at rest on-device.
+// Stores the user's own Gemini API key encrypted at rest on-device.
 // The key never leaves the device except in direct HTTPS calls to
-// Anthropic's API that the user's own key authenticates.
+// Google's Gemini API that the user's own key authenticates.
 object ApiKeyStore {
 
     private const val PREFS_NAME = "myride_secure_prefs"
-    private const val KEY_API_KEY = "anthropic_api_key"
+    private const val KEY_API_KEY = "gemini_api_key"
 
     private fun prefs(context: Context) = run {
         val masterKey = MasterKey.Builder(context)

@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.wickwirez.myride.data.ApiKeyStore
 import com.wickwirez.myride.data.ChatMessage
-import com.wickwirez.myride.data.ClaudeApiClient
+import com.wickwirez.myride.data.GeminiApiClient
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.launch
@@ -81,7 +81,7 @@ fun AiAssistantScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Add your Claude API key in Settings to use the assistant.")
+                        Text("Add your free Gemini API key in Settings to use the assistant.")
                         Spacer(Modifier.height(12.dp))
                         Button(onClick = onOpenSettings) { Text("Open Settings") }
                     }
@@ -128,10 +128,10 @@ fun AiAssistantScreen(
                             messages = newHistory
                             sending = true
                             coroutineScope.launch {
-                                val result = ClaudeApiClient.sendMessage(apiKey, systemPrompt, newHistory)
+                                val result = GeminiApiClient.sendMessage(apiKey, systemPrompt, newHistory)
                                 sending = false
                                 result.onSuccess { reply ->
-                                    messages = messages + ChatMessage("assistant", reply)
+                                    messages = messages + ChatMessage("model", reply)
                                 }.onFailure { e ->
                                     error = e.message ?: "Something went wrong"
                                 }
