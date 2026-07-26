@@ -69,4 +69,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

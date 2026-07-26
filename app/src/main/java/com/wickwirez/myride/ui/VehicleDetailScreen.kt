@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -32,6 +33,7 @@ fun VehicleDetailScreen(
     dueStatus: DueStatus,
     onAddService: () -> Unit,
     onRecordClick: (ServiceRecord) -> Unit,
+    onOpenAssistant: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -46,6 +48,11 @@ fun VehicleDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenAssistant) {
+                        Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "AI Assistant")
                     }
                 }
             )

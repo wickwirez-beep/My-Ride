@@ -21,12 +21,14 @@ import com.wickwirez.myride.ui.AddServiceRecordScreen
 import com.wickwirez.myride.ui.AddServiceRecordViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
+import com.wickwirez.myride.ui.AiAssistantScreen
 import com.wickwirez.myride.ui.EditServiceRecordScreen
 import com.wickwirez.myride.ui.EditServiceRecordViewModel
 import com.wickwirez.myride.ui.EditVehicleScreen
 import com.wickwirez.myride.ui.EditVehicleViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
+import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
 import com.wickwirez.myride.ui.theme.MyRideTheme
@@ -68,8 +70,13 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onDeleteVehicle = { vehicle -> viewModel.deleteVehicle(vehicle) },
                 onEditVehicle = { vehicle ->
                     navController.navigate("edit_vehicle/${vehicle.id}")
-                }
+                },
+                onOpenSettings = { navController.navigate("settings") }
             )
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
 
         composable("add_vehicle") {
@@ -104,6 +111,24 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onRecordClick = { record ->
                     navController.navigate("edit_service_record/${record.id}")
                 },
+                onOpenAssistant = { navController.navigate("ai_assistant/$vehicleId") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "ai_assistant/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: VehicleDetailViewModel =
+                viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            AiAssistantScreen(
+                vehicle = uiState.vehicle,
+                records = uiState.records,
+                onOpenSettings = { navController.navigate("settings") },
                 onBack = { navController.popBackStack() }
             )
         }

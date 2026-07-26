@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,16 +34,28 @@ import coil.compose.AsyncImage
 import com.wickwirez.myride.model.Vehicle
 
 @OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GarageScreen(
     vehicles: List<VehicleWithStatus>,
     onAddVehicle: () -> Unit,
     onVehicleClick: (Vehicle) -> Unit,
     onDeleteVehicle: (Vehicle) -> Unit = {},
-    onEditVehicle: (Vehicle) -> Unit = {}
+    onEditVehicle: (Vehicle) -> Unit = {},
+    onOpenSettings: () -> Unit = {}
 ) {
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("My Ride") },
+                actions = {
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onAddVehicle,
