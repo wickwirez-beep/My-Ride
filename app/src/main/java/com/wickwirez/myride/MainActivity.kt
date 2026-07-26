@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -22,6 +22,8 @@ import com.wickwirez.myride.ui.AddServiceRecordScreen
 import com.wickwirez.myride.ui.AddServiceRecordViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
+import com.wickwirez.myride.ui.EditVehicleScreen
+import com.wickwirez.myride.ui.EditVehicleViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
 import com.wickwirez.myride.ui.VehicleDetailScreen
@@ -62,8 +64,8 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                     navController.navigate("vehicle_detail/${vehicle.id}")
                 },
                 onDeleteVehicle = { vehicle -> viewModel.deleteVehicle(vehicle) },
-                onEditVehicle = {
-                    // TODO: navigate to an edit-vehicle screen once it exists
+                onEditVehicle = { vehicle ->
+                    navController.navigate("edit_vehicle/${vehicle.id}")
                 }
             )
         }
@@ -117,6 +119,33 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onSave = { record ->
                     viewModel.saveRecord(record) {
                         navController.popBackStack()
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "edit_vehicle/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: EditVehicleViewModel =
+                viewModel(factory = EditVehicleViewModel.factory(repository, vehicleId))
+            val vehicle by viewModel.vehicle.collectAsStateWithLifecycle()
+
+            EditVehicleScreen(
+                vehicle = vehicle,
+                onSave = { updated ->
+                    viewModel.saveVehicle(updated) {
+                        navController.popBackStack()
+                    }
+                },
+                onDelete = {
+                    vehicle?.let {
+                        viewModel.deleteVehicle(it) {
+                            navController.popBackStack()
+                        }
                     }
                 },
                 onBack = { navController.popBackStack() }

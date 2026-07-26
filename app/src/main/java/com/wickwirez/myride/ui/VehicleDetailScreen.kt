@@ -3,6 +3,7 @@ package com.wickwirez.myride.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -10,9 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.Vehicle
 import java.text.SimpleDateFormat
@@ -65,6 +69,20 @@ fun VehicleDetailScreen(
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
 
             Column(modifier = Modifier.padding(16.dp)) {
+
+                if (vehicle.photoUri != null) {
+                    AsyncImage(
+                        model = vehicle.photoUri,
+                        contentDescription = "Vehicle photo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+
                 Text(
                     "${vehicle.year} ${vehicle.make} ${vehicle.model}${if (vehicle.trim.isNotBlank()) " ${vehicle.trim}" else ""}",
                     fontSize = 18.sp,
@@ -76,19 +94,13 @@ fun VehicleDetailScreen(
                     Text("VIN: ${vehicle.vin}")
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "Total spent: ${formatCost(totalCost)}",
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = "Total spent: ${formatCost(totalCost)}", fontWeight = FontWeight.Bold)
             }
 
             HorizontalDivider()
 
             if (records.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("No service history yet. Tap Log Service to add the first entry.")
                 }
             } else {
@@ -109,10 +121,7 @@ fun VehicleDetailScreen(
 private fun ServiceRecordRow(record: ServiceRecord) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(record.type.name.replace('_', ' '), fontWeight = FontWeight.Bold)
                 Text(formatCost(record.cost))
             }

@@ -13,5 +13,6 @@ data class Vehicle(
     val model: String,
     val trim: String = "",
     val vin: String = "",
-    val currentMileage: Int = 0
+    val currentMileage: Int = 0,
+    val photoUri: String? = null
 )

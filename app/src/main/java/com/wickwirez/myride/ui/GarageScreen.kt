@@ -1,9 +1,11 @@
 package com.wickwirez.myride.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DirectionsCar
@@ -13,9 +15,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.wickwirez.myride.model.Vehicle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,94 +34,45 @@ fun GarageScreen(
 ) {
 
     Scaffold(
-
         floatingActionButton = {
-
             ExtendedFloatingActionButton(
                 onClick = onAddVehicle,
-                icon = {
-                    Icon(Icons.Default.Add, null)
-                },
-                text = {
-                    Text("Add Vehicle")
-                }
+                icon = { Icon(Icons.Default.Add, null) },
+                text = { Text("Add Vehicle") }
             )
-
         }
-
     ) { padding ->
 
         if (vehicles.isEmpty()) {
-
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Icon(
-                        Icons.Default.DirectionsCar,
-                        null,
-                        modifier = Modifier.size(80.dp)
-                    )
-
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.DirectionsCar, null, modifier = Modifier.size(80.dp))
                     Spacer(Modifier.height(20.dp))
-
-                    Text(
-                        "Your Garage is Empty",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
+                    Text("Your Garage is Empty", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        "Tap Add Vehicle to begin."
-                    )
-
+                    Text("Tap Add Vehicle to begin.")
                 }
-
             }
-
         } else {
-
             LazyColumn(
                 modifier = Modifier.padding(padding),
                 contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
-                items(
-                    items = vehicles,
-                    key = { it.id }
-                ) { vehicle ->
-
+                items(items = vehicles, key = { it.id }) { vehicle ->
                     VehicleCard(
                         vehicle = vehicle,
-                        onClick = {
-                            onVehicleClick(vehicle)
-                        },
-                        onDelete = {
-                            onDeleteVehicle(vehicle)
-                        },
-                        onEdit = {
-                            onEditVehicle(vehicle)
-                        }
+                        onClick = { onVehicleClick(vehicle) },
+                        onDelete = { onDeleteVehicle(vehicle) },
+                        onEdit = { onEditVehicle(vehicle) }
                     )
-
                 }
-
             }
-
         }
-
     }
-
 }
 
 @Composable
@@ -126,29 +82,37 @@ private fun VehicleCard(
     onDelete: () -> Unit,
     onEdit: () -> Unit
 ) {
-
-    var menuExpanded by remember {
-        mutableStateOf(false)
-    }
+    var menuExpanded by remember { mutableStateOf(false) }
 
     ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
     ) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Column(
-                    modifier = Modifier.weight(1f)
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
                 ) {
+                    if (vehicle.photoUri != null) {
+                        AsyncImage(
+                            model = vehicle.photoUri,
+                            contentDescription = "Vehicle photo",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Default.DirectionsCar, null)
+                    }
+                }
 
+                Spacer(Modifier.width(12.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = if (vehicle.nickname.isBlank())
                             "${vehicle.year} ${vehicle.make} ${vehicle.model}"
@@ -157,88 +121,41 @@ private fun VehicleCard(
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-
-                    Text(
-                        "${vehicle.year} ${vehicle.make} ${vehicle.model}"
-                    )
-
+                    Text("${vehicle.year} ${vehicle.make} ${vehicle.model}")
                 }
 
                 Box {
-
-                    IconButton(
-                        onClick = {
-                            menuExpanded = true
-                        }
-                    ) {
-
-                        Icon(
-                            Icons.Default.MoreVert,
-                            null
-                        )
-
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, null)
                     }
-
                     DropdownMenu(
                         expanded = menuExpanded,
-                        onDismissRequest = {
-                            menuExpanded = false
-                        }
+                        onDismissRequest = { menuExpanded = false }
                     ) {
-
                         DropdownMenuItem(
                             text = { Text("Edit") },
-                            onClick = {
-                                menuExpanded = false
-                                onEdit()
-                            }
+                            onClick = { menuExpanded = false; onEdit() }
                         )
-
                         DropdownMenuItem(
                             text = { Text("Delete") },
-                            onClick = {
-                                menuExpanded = false
-                                onDelete()
-                            }
+                            onClick = { menuExpanded = false; onDelete() }
                         )
-
                     }
-
                 }
-
             }
 
             Spacer(Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    Icons.Default.Speed,
-                    null
-                )
-
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Speed, null)
                 Spacer(Modifier.width(8.dp))
-
-                Text(
-                    "${vehicle.currentMileage} miles"
-                )
-
+                Text("${vehicle.currentMileage} miles")
             }
 
             if (vehicle.vin.isNotBlank()) {
-
                 Spacer(Modifier.height(8.dp))
-
-                Text(
-                    "VIN: ${vehicle.vin}"
-                )
-
+                Text("VIN: ${vehicle.vin}")
             }
-
         }
-
     }
-
 }

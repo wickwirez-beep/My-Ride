@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,18 +28,52 @@ import com.wickwirez.myride.model.Vehicle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddVehicleScreen(
+fun EditVehicleScreen(
+    vehicle: Vehicle?,
     onSave: (Vehicle) -> Unit,
+    onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
-    var nickname by remember { mutableStateOf("") }
-    var year by remember { mutableStateOf("") }
-    var make by remember { mutableStateOf("") }
-    var model by remember { mutableStateOf("") }
-    var trim by remember { mutableStateOf("") }
-    var vin by remember { mutableStateOf("") }
-    var currentMileage by remember { mutableStateOf("") }
-    var photoUri by remember { mutableStateOf<String?>(null) }
+    if (vehicle == null) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Edit Vehicle") },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text("Vehicle not found.")
+            }
+        }
+        return
+    }
+
+    EditVehicleForm(vehicle = vehicle, onSave = onSave, onDelete = onDelete, onBack = onBack)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditVehicleForm(
+    vehicle: Vehicle,
+    onSave: (Vehicle) -> Unit,
+    onDelete: () -> Unit,
+    onBack: () -> Unit
+) {
+    var nickname by remember(vehicle.id) { mutableStateOf(vehicle.nickname) }
+    var year by remember(vehicle.id) { mutableStateOf(vehicle.year.toString()) }
+    var make by remember(vehicle.id) { mutableStateOf(vehicle.make) }
+    var model by remember(vehicle.id) { mutableStateOf(vehicle.model) }
+    var trim by remember(vehicle.id) { mutableStateOf(vehicle.trim) }
+    var vin by remember(vehicle.id) { mutableStateOf(vehicle.vin) }
+    var currentMileage by remember(vehicle.id) { mutableStateOf(vehicle.currentMileage.toString()) }
+    var photoUri by remember(vehicle.id) { mutableStateOf(vehicle.photoUri) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
 
@@ -53,13 +88,15 @@ fun AddVehicleScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Vehicle") },
+                title = { Text("Edit Vehicle") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showDeleteConfirm = true }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete Vehicle")
                     }
                 }
             )
@@ -161,7 +198,7 @@ fun AddVehicleScreen(
             OutlinedTextField(
                 value = currentMileage,
                 onValueChange = { currentMileage = it },
-                label = { Text("Current Mileage (Optional)") },
+                label = { Text("Current Mileage") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -176,7 +213,7 @@ fun AddVehicleScreen(
                     val mileage = currentMileage.toIntOrNull() ?: 0
 
                     onSave(
-                        Vehicle(
+                        vehicle.copy(
                             nickname = nickname.trim(),
                             year = parsedYear,
                             make = make.trim(),
@@ -189,10 +226,27 @@ fun AddVehicleScreen(
                     )
                 }
             ) {
-                Text("Save Vehicle")
+                Text("Save Changes")
             }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text("Delete Vehicle?") },
+            text = { Text("This removes the vehicle and its full service history. This can't be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirm = false
+                    onDelete()
+                }) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancel") }
+            }
+        )
     }
 }
