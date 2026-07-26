@@ -12,7 +12,7 @@ data class ChatMessage(val role: String, val content: String)
 
 object GeminiApiClient {
 
-    private const val MODEL = "gemini-2.5-flash"
+    private const val MODEL = "gemini-3.5-flash-lite"
 
     suspend fun sendMessage(
         apiKey: String,
