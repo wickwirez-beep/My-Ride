@@ -5,5 +5,5 @@ plugins {
     // https://github.com/google/ksp/releases before building — KSP
     // versions are pinned to a specific Kotlin release and this repo
     // was scaffolded from memory of your stated toolchain, not a live check.
-    id("com.google.devtools.ksp") version "2.3.20-1.0.24" apply false
+    id("com.google.devtools.ksp") version "2.3.9" apply false
 }
