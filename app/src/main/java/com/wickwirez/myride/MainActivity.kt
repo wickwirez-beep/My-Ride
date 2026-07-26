@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +29,7 @@ import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
+import com.wickwirez.myride.ui.theme.MyRideTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         val repository = (application as MyRideApplication).repository
 
         setContent {
-            MaterialTheme {
+            MyRideTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MyRideNavHost(repository)
                 }
