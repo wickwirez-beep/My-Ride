@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Print
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +62,12 @@ fun VehicleDetailScreen(
                     }
                 },
                 actions = {
+                    if (vehicle != null) {
+                        val context = LocalContext.current
+                        IconButton(onClick = { PrintHelper.printServiceHistory(context, vehicle, records) }) {
+                            Icon(Icons.Default.Print, contentDescription = "Print service history")
+                        }
+                    }
                     IconButton(onClick = onOpenAssistant) {
                         Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "AI Assistant")
                     }

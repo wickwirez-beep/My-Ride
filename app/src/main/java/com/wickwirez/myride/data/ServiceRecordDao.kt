@@ -15,6 +15,9 @@ interface ServiceRecordDao {
     @Query("SELECT * FROM service_records WHERE vehicleId = :vehicleId ORDER BY date DESC")
     fun getRecordsForVehicle(vehicleId: Long): Flow<List<ServiceRecord>>
 
+    @Query("SELECT * FROM service_records")
+    suspend fun getAllRecordsOnce(): List<ServiceRecord>
+
     @Query("SELECT * FROM service_records WHERE id = :recordId")
     fun getRecordById(recordId: Long): Flow<ServiceRecord?>
 

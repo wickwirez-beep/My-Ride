@@ -10,6 +10,8 @@ class VehicleRepository(
 ) {
     fun getAllVehicles(): Flow<List<Vehicle>> = vehicleDao.getAllVehicles()
 
+    suspend fun getAllVehiclesOnce(): List<Vehicle> = vehicleDao.getAllVehiclesOnce()
+
     fun getVehicleById(id: Long): Flow<Vehicle?> = vehicleDao.getVehicleById(id)
 
     suspend fun addVehicle(vehicle: Vehicle): Long = vehicleDao.insertVehicle(vehicle)
@@ -23,6 +25,8 @@ class VehicleRepository(
 
     fun getRecordsForVehicle(vehicleId: Long): Flow<List<ServiceRecord>> =
         serviceRecordDao.getRecordsForVehicle(vehicleId)
+
+    suspend fun getAllRecordsOnce(): List<ServiceRecord> = serviceRecordDao.getAllRecordsOnce()
 
     fun getRecordById(recordId: Long): Flow<ServiceRecord?> =
         serviceRecordDao.getRecordById(recordId)

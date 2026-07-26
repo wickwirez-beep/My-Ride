@@ -86,7 +86,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         }
 
         composable("settings") {
-            SettingsScreen(onBack = { navController.popBackStack() })
+            SettingsScreen(repository = repository, onBack = { navController.popBackStack() })
         }
 
         composable("add_vehicle") {
