@@ -43,6 +43,7 @@ fun AddVehicleScreen(
     var photoUri by remember { mutableStateOf<String?>(null) }
     var decoding by remember { mutableStateOf(false) }
     var decodeError by remember { mutableStateOf<String?>(null) }
+    var decodeSuccess by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     val scrollState = rememberScrollState()
@@ -156,7 +157,7 @@ fun AddVehicleScreen(
 
             OutlinedTextField(
                 value = vin,
-                onValueChange = { vin = it.uppercase(); decodeError = null },
+                onValueChange = { vin = it.uppercase(); decodeError = null; decodeSuccess = null },
                 label = { Text("VIN (Optional)") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -176,6 +177,7 @@ fun AddVehicleScreen(
                                 if (make.isBlank()) make = result.make
                                 if (model.isBlank()) model = result.model
                                 if (trim.isBlank()) trim = result.trim
+                                decodeSuccess = "Decoded: ${result.year ?: ""} ${result.make} ${result.model} ${result.trim}".trim()
                             } else {
                                 decodeError = "Couldn't decode that VIN"
                             }
@@ -193,6 +195,13 @@ fun AddVehicleScreen(
                 Text(
                     decodeError!!,
                     color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (decodeSuccess != null) {
+                Text(
+                    decodeSuccess!!,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

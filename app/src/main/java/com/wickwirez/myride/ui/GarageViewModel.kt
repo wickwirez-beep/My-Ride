@@ -20,9 +20,8 @@ data class VehicleWithStatus(
     val dueStatus: DueStatus
 )
 
-private const val DUE_SOON_MILES_WINDOW = 500
-private const val DUE_SOON_DAYS_WINDOW = 14
 private const val MS_PER_DAY = 24L * 60 * 60 * 1000
+private const val DUE_SOON_FRACTION = 0.1
 
 class GarageViewModel(private val repository: VehicleRepository) : ViewModel() {
 
@@ -57,19 +56,25 @@ private fun computeDueStatus(vehicle: Vehicle, record: ServiceRecord?, nowMs: Lo
     var dueSoon = false
 
     record.reminderIntervalMiles?.let { interval ->
-        val remaining = (record.mileage + interval) - vehicle.currentMileage
-        when {
-            remaining <= 0 -> overdue = true
-            remaining <= DUE_SOON_MILES_WINDOW -> dueSoon = true
+        if (interval > 0) {
+            val remaining = (record.mileage + interval) - vehicle.currentMileage
+            val threshold = (interval * DUE_SOON_FRACTION).coerceAtLeast(1.0)
+            when {
+                remaining <= 0 -> overdue = true
+                remaining <= threshold -> dueSoon = true
+            }
         }
     }
 
     record.reminderIntervalDays?.let { interval ->
-        val dueAtMs = record.date + interval * MS_PER_DAY
-        val remainingDays = (dueAtMs - nowMs) / MS_PER_DAY
-        when {
-            remainingDays <= 0 -> overdue = true
-            remainingDays <= DUE_SOON_DAYS_WINDOW -> dueSoon = true
+        if (interval > 0) {
+            val dueAtMs = record.date + interval * MS_PER_DAY
+            val remainingDays = (dueAtMs - nowMs) / MS_PER_DAY
+            val threshold = (interval * DUE_SOON_FRACTION).coerceAtLeast(1.0)
+            when {
+                remainingDays <= 0 -> overdue = true
+                remainingDays <= threshold -> dueSoon = true
+            }
         }
     }
 

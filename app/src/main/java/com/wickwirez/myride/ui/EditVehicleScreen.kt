@@ -77,6 +77,7 @@ private fun EditVehicleForm(
     var photoUri by remember(vehicle.id) { mutableStateOf(vehicle.photoUri) }
     var decoding by remember { mutableStateOf(false) }
     var decodeError by remember { mutableStateOf<String?>(null) }
+    var decodeSuccess by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -193,7 +194,7 @@ private fun EditVehicleForm(
 
             OutlinedTextField(
                 value = vin,
-                onValueChange = { vin = it.uppercase(); decodeError = null },
+                onValueChange = { vin = it.uppercase(); decodeError = null; decodeSuccess = null },
                 label = { Text("VIN (Optional)") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -213,6 +214,7 @@ private fun EditVehicleForm(
                                 if (result.make.isNotBlank()) make = result.make
                                 if (result.model.isNotBlank()) model = result.model
                                 if (result.trim.isNotBlank()) trim = result.trim
+                                decodeSuccess = "Decoded: ${result.year ?: ""} ${result.make} ${result.model} ${result.trim}".trim()
                             } else {
                                 decodeError = "Couldn't decode that VIN"
                             }
@@ -230,6 +232,13 @@ private fun EditVehicleForm(
                 Text(
                     decodeError!!,
                     color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (decodeSuccess != null) {
+                Text(
+                    decodeSuccess!!,
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
