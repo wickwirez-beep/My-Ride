@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +65,9 @@ fun VehicleDetailScreen(
                 actions = {
                     if (vehicle != null) {
                         val context = LocalContext.current
+                        IconButton(onClick = { ShareHelper.shareVehicleSummary(context, vehicle, records) }) {
+                            Icon(Icons.Default.Share, contentDescription = "Share vehicle summary")
+                        }
                         IconButton(onClick = { PrintHelper.printServiceHistory(context, vehicle, records) }) {
                             Icon(Icons.Default.Print, contentDescription = "Print service history")
                         }
