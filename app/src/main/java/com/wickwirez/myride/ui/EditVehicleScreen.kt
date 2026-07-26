@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.launch
@@ -83,11 +85,18 @@ private fun EditVehicleForm(
 
     val scrollState = rememberScrollState()
 
+    val context = LocalContext.current
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            photoUri = uri.toString()
+            coroutineScope.launch {
+                val savedPath = PhotoStorage.copyToInternalStorage(context, uri)
+                if (savedPath != null) {
+                    photoUri = savedPath
+                }
+            }
         }
     }
 
