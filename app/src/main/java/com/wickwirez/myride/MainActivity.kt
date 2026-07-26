@@ -22,6 +22,8 @@ import com.wickwirez.myride.ui.AddServiceRecordScreen
 import com.wickwirez.myride.ui.AddServiceRecordViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
+import com.wickwirez.myride.ui.EditServiceRecordScreen
+import com.wickwirez.myride.ui.EditServiceRecordViewModel
 import com.wickwirez.myride.ui.EditVehicleScreen
 import com.wickwirez.myride.ui.EditVehicleViewModel
 import com.wickwirez.myride.ui.GarageScreen
@@ -98,6 +100,9 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 records = uiState.records,
                 totalCost = uiState.totalCost,
                 onAddService = { navController.navigate("add_service_record/$vehicleId") },
+                onRecordClick = { record ->
+                    navController.navigate("edit_service_record/${record.id}")
+                },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -119,6 +124,33 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onSave = { record ->
                     viewModel.saveRecord(record) {
                         navController.popBackStack()
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "edit_service_record/{recordId}",
+            arguments = listOf(navArgument("recordId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val recordId = backStackEntry.arguments?.getLong("recordId") ?: return@composable
+            val viewModel: EditServiceRecordViewModel =
+                viewModel(factory = EditServiceRecordViewModel.factory(repository, recordId))
+            val record by viewModel.record.collectAsStateWithLifecycle()
+
+            EditServiceRecordScreen(
+                record = record,
+                onSave = { updated ->
+                    viewModel.saveRecord(updated) {
+                        navController.popBackStack()
+                    }
+                },
+                onDelete = {
+                    record?.let {
+                        viewModel.deleteRecord(it) {
+                            navController.popBackStack()
+                        }
                     }
                 },
                 onBack = { navController.popBackStack() }

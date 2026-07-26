@@ -24,7 +24,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.wickwirez.myride.data.VinDecoder
 import com.wickwirez.myride.model.Vehicle
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +75,9 @@ private fun EditVehicleForm(
     var vin by remember(vehicle.id) { mutableStateOf(vehicle.vin) }
     var currentMileage by remember(vehicle.id) { mutableStateOf(vehicle.currentMileage.toString()) }
     var photoUri by remember(vehicle.id) { mutableStateOf(vehicle.photoUri) }
+    var decoding by remember { mutableStateOf(false) }
+    var decodeError by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -188,10 +193,46 @@ private fun EditVehicleForm(
 
             OutlinedTextField(
                 value = vin,
-                onValueChange = { vin = it.uppercase() },
+                onValueChange = { vin = it.uppercase(); decodeError = null },
                 label = { Text("VIN (Optional)") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(
+                    onClick = {
+                        decodeError = null
+                        decoding = true
+                        coroutineScope.launch {
+                            val result = VinDecoder.decode(vin.trim())
+                            decoding = false
+                            if (result != null) {
+                                if (result.year != null) year = result.year.toString()
+                                if (result.make.isNotBlank()) make = result.make
+                                if (result.model.isNotBlank()) model = result.model
+                                if (result.trim.isNotBlank()) trim = result.trim
+                            } else {
+                                decodeError = "Couldn't decode that VIN"
+                            }
+                        }
+                    },
+                    enabled = vin.trim().length == 17 && !decoding
+                ) {
+                    Text(if (decoding) "Decoding…" else "Decode VIN")
+                }
+                if (decoding) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                }
+            }
+            if (decodeError != null) {
+                Text(
+                    decodeError!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 

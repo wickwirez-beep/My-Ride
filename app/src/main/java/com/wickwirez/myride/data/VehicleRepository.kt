@@ -24,6 +24,9 @@ class VehicleRepository(
     fun getRecordsForVehicle(vehicleId: Long): Flow<List<ServiceRecord>> =
         serviceRecordDao.getRecordsForVehicle(vehicleId)
 
+    fun getRecordById(recordId: Long): Flow<ServiceRecord?> =
+        serviceRecordDao.getRecordById(recordId)
+
     fun getTotalCostForVehicle(vehicleId: Long): Flow<Double> =
         serviceRecordDao.getTotalCostForVehicle(vehicleId)
 

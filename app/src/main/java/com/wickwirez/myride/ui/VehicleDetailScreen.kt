@@ -1,5 +1,6 @@
 package com.wickwirez.myride.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +30,7 @@ fun VehicleDetailScreen(
     records: List<ServiceRecord>,
     totalCost: Double,
     onAddService: () -> Unit,
+    onRecordClick: (ServiceRecord) -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -109,7 +111,7 @@ fun VehicleDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(items = records, key = { it.id }) { record ->
-                        ServiceRecordRow(record)
+                        ServiceRecordRow(record, onClick = { onRecordClick(record) })
                     }
                 }
             }
@@ -118,8 +120,8 @@ fun VehicleDetailScreen(
 }
 
 @Composable
-private fun ServiceRecordRow(record: ServiceRecord) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+private fun ServiceRecordRow(record: ServiceRecord, onClick: () -> Unit) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(record.type.name.replace('_', ' '), fontWeight = FontWeight.Bold)
