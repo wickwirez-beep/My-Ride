@@ -1,5 +1,10 @@
 package com.wickwirez.myride.ui
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -110,6 +116,39 @@ fun AiAssistantScreen(
                     modifier = Modifier.fillMaxWidth().padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val speechLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.StartActivityForResult()
+                    ) { result ->
+                        if (result.resultCode == Activity.RESULT_OK) {
+                            val spokenText = result.data
+                                ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                                ?.firstOrNull()
+                            if (!spokenText.isNullOrBlank()) {
+                                input = spokenText
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
+                            try {
+                                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                    putExtra(
+                                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                    )
+                                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Ask about your vehicle…")
+                                }
+                                speechLauncher.launch(intent)
+                            } catch (e: Exception) {
+                                error = "Voice input isn't available on this device."
+                            }
+                        },
+                        enabled = !sending
+                    ) {
+                        Icon(Icons.Default.Mic, contentDescription = "Voice input")
+                    }
+
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it },
