@@ -1,5 +1,6 @@
 package com.wickwirez.myride.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +12,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +29,8 @@ import coil.compose.AsyncImage
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.Vehicle
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +119,11 @@ fun VehicleDetailScreen(
                     Spacer(Modifier.height(8.dp))
                     DueStatusBeacon(dueStatus)
                 }
+
+                if (records.isNotEmpty()) {
+                    Spacer(Modifier.height(16.dp))
+                    SpendingChart(records)
+                }
             }
 
             HorizontalDivider()
@@ -158,3 +172,78 @@ private fun formatCost(cost: Double): String =
 
 private fun formatDate(epochMillis: Long): String =
     SimpleDateFormat("MMM d, yyyy", Locale.US).format(epochMillis)
+
+@Composable
+private fun SpendingChart(records: List<ServiceRecord>) {
+    var monthLabels by remember { mutableStateOf(listOf<String>()) }
+    val monthTotals = remember { mutableStateListOf<Double>() }
+
+    LaunchedEffect(records) {
+        val monthKeyFormat = SimpleDateFormat("yyyy-MM", Locale.US)
+        val monthLabelFormat = SimpleDateFormat("MMM", Locale.US)
+
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, -5)
+
+        val keys = mutableListOf<String>()
+        val labels = mutableListOf<String>()
+        repeat(6) {
+            keys.add(monthKeyFormat.format(cal.time))
+            labels.add(monthLabelFormat.format(cal.time))
+            cal.add(Calendar.MONTH, 1)
+        }
+
+        val totalsByKey = HashMap<String, Double>()
+        keys.forEach { totalsByKey[it] = 0.0 }
+
+        records.forEach { record ->
+            val key = monthKeyFormat.format(Date(record.date))
+            if (totalsByKey.containsKey(key)) {
+                totalsByKey[key] = (totalsByKey[key] ?: 0.0) + record.cost
+            }
+        }
+
+        monthTotals.clear()
+        monthTotals.addAll(keys.map { totalsByKey[it] ?: 0.0 })
+        monthLabels = labels
+    }
+
+    if (monthTotals.isEmpty()) return
+
+    val maxValue = (monthTotals.maxOrNull() ?: 0.0).coerceAtLeast(1.0)
+    val barColor = MaterialTheme.colorScheme.primary
+
+    Column {
+        Text(
+            "Spending (last 6 months)",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().height(110.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            monthTotals.forEachIndexed { index, total ->
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    val barFraction = (total / maxValue).toFloat().coerceIn(0f, 1f).coerceAtLeast(0.03f)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .fillMaxHeight(barFraction)
+                            .background(barColor, RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        monthLabels.getOrElse(index) { "" },
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+        }
+    }
+}
