@@ -43,3 +43,27 @@ fun computeDueStatus(vehicle: Vehicle, record: ServiceRecord?, nowMs: Long): Due
         else -> DueStatus.OK
     }
 }
+
+// Checks every reminder-bearing record for a vehicle (not just the most
+// recent one) and returns the single most urgent status across all of them.
+fun computeWorstDueStatus(vehicle: Vehicle, records: List<ServiceRecord>, nowMs: Long): DueStatus {
+    if (records.isEmpty()) return DueStatus.NONE
+
+    var sawDueSoon = false
+    var sawOk = false
+
+    for (record in records) {
+        when (computeDueStatus(vehicle, record, nowMs)) {
+            DueStatus.OVERDUE -> return DueStatus.OVERDUE
+            DueStatus.DUE_SOON -> sawDueSoon = true
+            DueStatus.OK -> sawOk = true
+            DueStatus.NONE -> {}
+        }
+    }
+
+    return when {
+        sawDueSoon -> DueStatus.DUE_SOON
+        sawOk -> DueStatus.OK
+        else -> DueStatus.NONE
+    }
+}

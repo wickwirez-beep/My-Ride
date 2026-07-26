@@ -22,17 +22,9 @@ interface ServiceRecordDao {
     fun getTotalCostForVehicle(vehicleId: Long): Flow<Double>
 
     @Query(
-        """
-        SELECT * FROM service_records sr1
-        WHERE (sr1.reminderIntervalMiles IS NOT NULL OR sr1.reminderIntervalDays IS NOT NULL)
-        AND sr1.date = (
-            SELECT MAX(sr2.date) FROM service_records sr2
-            WHERE sr2.vehicleId = sr1.vehicleId
-            AND (sr2.reminderIntervalMiles IS NOT NULL OR sr2.reminderIntervalDays IS NOT NULL)
-        )
-        """
+        "SELECT * FROM service_records WHERE reminderIntervalMiles IS NOT NULL OR reminderIntervalDays IS NOT NULL"
     )
-    fun getLatestReminderRecords(): Flow<List<ServiceRecord>>
+    fun getReminderRecords(): Flow<List<ServiceRecord>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecord(record: ServiceRecord): Long

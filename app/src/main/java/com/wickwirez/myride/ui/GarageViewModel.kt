@@ -21,12 +21,15 @@ class GarageViewModel(private val repository: VehicleRepository) : ViewModel() {
 
     val vehicles: StateFlow<List<VehicleWithStatus>> = combine(
         repository.getAllVehicles(),
-        repository.getLatestReminderRecords()
+        repository.getReminderRecords()
     ) { vehicles, reminderRecords ->
-        val recordsByVehicle = reminderRecords.associateBy { it.vehicleId }
+        val recordsByVehicle = reminderRecords.groupBy { it.vehicleId }
         val now = System.currentTimeMillis()
         vehicles.map { vehicle ->
-            VehicleWithStatus(vehicle, computeDueStatus(vehicle, recordsByVehicle[vehicle.id], now))
+            VehicleWithStatus(
+                vehicle,
+                computeWorstDueStatus(vehicle, recordsByVehicle[vehicle.id] ?: emptyList(), now)
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

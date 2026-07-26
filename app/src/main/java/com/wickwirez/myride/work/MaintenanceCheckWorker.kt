@@ -7,7 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.wickwirez.myride.MyRideApplication
 import com.wickwirez.myride.ui.DueStatus
-import com.wickwirez.myride.ui.computeDueStatus
+import com.wickwirez.myride.ui.computeWorstDueStatus
 import kotlinx.coroutines.flow.first
 
 class MaintenanceCheckWorker(
@@ -19,15 +19,15 @@ class MaintenanceCheckWorker(
         val repository = (applicationContext as MyRideApplication).repository
 
         val vehicles = repository.getAllVehicles().first()
-        val reminderRecords = repository.getLatestReminderRecords().first()
-        val recordsByVehicle = reminderRecords.associateBy { it.vehicleId }
+        val reminderRecords = repository.getReminderRecords().first()
+        val recordsByVehicle = reminderRecords.groupBy { it.vehicleId }
         val now = System.currentTimeMillis()
 
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         vehicles.forEach { vehicle ->
-            val status = computeDueStatus(vehicle, recordsByVehicle[vehicle.id], now)
+            val status = computeWorstDueStatus(vehicle, recordsByVehicle[vehicle.id] ?: emptyList(), now)
             if (status == DueStatus.OVERDUE || status == DueStatus.DUE_SOON) {
                 val title = if (status == DueStatus.OVERDUE) "Maintenance overdue" else "Maintenance due soon"
                 val vehicleName = vehicle.nickname.ifBlank {

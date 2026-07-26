@@ -30,11 +30,11 @@ class VehicleDetailViewModel(
         repository.getRecordsForVehicle(vehicleId),
         repository.getTotalCostForVehicle(vehicleId)
     ) { vehicle, records, totalCost ->
-        val reminderRecord = records.firstOrNull {
+        val reminderRecords = records.filter {
             it.reminderIntervalMiles != null || it.reminderIntervalDays != null
         }
         val dueStatus = if (vehicle != null) {
-            computeDueStatus(vehicle, reminderRecord, System.currentTimeMillis())
+            computeWorstDueStatus(vehicle, reminderRecords, System.currentTimeMillis())
         } else {
             DueStatus.NONE
         }
