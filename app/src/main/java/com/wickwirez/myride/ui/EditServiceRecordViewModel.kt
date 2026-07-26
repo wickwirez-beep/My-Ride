@@ -8,6 +8,7 @@ import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.model.ServiceRecord
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -22,6 +23,14 @@ class EditServiceRecordViewModel(
     fun saveRecord(record: ServiceRecord, onSaved: () -> Unit) {
         viewModelScope.launch {
             repository.updateServiceRecord(record)
+
+            // Keep the vehicle's odometer in sync if this edit raised the mileage,
+            // same as Add Service already does.
+            val vehicle = repository.getVehicleById(record.vehicleId).first()
+            if (vehicle != null && record.mileage > vehicle.currentMileage) {
+                repository.updateMileage(record.vehicleId, record.mileage)
+            }
+
             onSaved()
         }
     }
