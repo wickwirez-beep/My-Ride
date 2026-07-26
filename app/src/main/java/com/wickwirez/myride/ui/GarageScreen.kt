@@ -1,0 +1,244 @@
+package com.wickwirez.myride.ui
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wickwirez.myride.model.Vehicle
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GarageScreen(
+    vehicles: List<Vehicle>,
+    onAddVehicle: () -> Unit,
+    onVehicleClick: (Vehicle) -> Unit,
+    onDeleteVehicle: (Vehicle) -> Unit = {},
+    onEditVehicle: (Vehicle) -> Unit = {}
+) {
+
+    Scaffold(
+
+        floatingActionButton = {
+
+            ExtendedFloatingActionButton(
+                onClick = onAddVehicle,
+                icon = {
+                    Icon(Icons.Default.Add, null)
+                },
+                text = {
+                    Text("Add Vehicle")
+                }
+            )
+
+        }
+
+    ) { padding ->
+
+        if (vehicles.isEmpty()) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Icon(
+                        Icons.Default.DirectionsCar,
+                        null,
+                        modifier = Modifier.size(80.dp)
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Text(
+                        "Your Garage is Empty",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Text(
+                        "Tap Add Vehicle to begin."
+                    )
+
+                }
+
+            }
+
+        } else {
+
+            LazyColumn(
+                modifier = Modifier.padding(padding),
+                contentPadding = PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                items(
+                    items = vehicles,
+                    key = { it.id }
+                ) { vehicle ->
+
+                    VehicleCard(
+                        vehicle = vehicle,
+                        onClick = {
+                            onVehicleClick(vehicle)
+                        },
+                        onDelete = {
+                            onDeleteVehicle(vehicle)
+                        },
+                        onEdit = {
+                            onEditVehicle(vehicle)
+                        }
+                    )
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+@Composable
+private fun VehicleCard(
+    vehicle: Vehicle,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit
+) {
+
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
+
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+
+                    Text(
+                        text = if (vehicle.nickname.isBlank())
+                            "${vehicle.year} ${vehicle.make} ${vehicle.model}"
+                        else
+                            vehicle.nickname,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        "${vehicle.year} ${vehicle.make} ${vehicle.model}"
+                    )
+
+                }
+
+                Box {
+
+                    IconButton(
+                        onClick = {
+                            menuExpanded = true
+                        }
+                    ) {
+
+                        Icon(
+                            Icons.Default.MoreVert,
+                            null
+                        )
+
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = {
+                            menuExpanded = false
+                        }
+                    ) {
+
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                menuExpanded = false
+                                onEdit()
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                menuExpanded = false
+                                onDelete()
+                            }
+                        )
+
+                    }
+
+                }
+
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    Icons.Default.Speed,
+                    null
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    "${vehicle.currentMileage} miles"
+                )
+
+            }
+
+            if (vehicle.vin.isNotBlank()) {
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    "VIN: ${vehicle.vin}"
+                )
+
+            }
+
+        }
+
+    }
+
+}
