@@ -34,7 +34,6 @@ import coil.compose.AsyncImage
 import com.wickwirez.myride.model.Vehicle
 
 @OptIn(ExperimentalMaterial3Api::class)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GarageScreen(
     vehicles: List<VehicleWithStatus>,
