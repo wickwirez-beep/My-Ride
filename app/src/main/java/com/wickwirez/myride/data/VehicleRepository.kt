@@ -27,6 +27,9 @@ class VehicleRepository(
     fun getTotalCostForVehicle(vehicleId: Long): Flow<Double> =
         serviceRecordDao.getTotalCostForVehicle(vehicleId)
 
+    fun getLatestReminderRecords(): Flow<List<ServiceRecord>> =
+        serviceRecordDao.getLatestReminderRecords()
+
     suspend fun addServiceRecord(record: ServiceRecord): Long =
         serviceRecordDao.insertRecord(record)
 

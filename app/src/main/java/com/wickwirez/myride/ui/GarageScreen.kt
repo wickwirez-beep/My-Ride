@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,7 @@ import com.wickwirez.myride.model.Vehicle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GarageScreen(
-    vehicles: List<Vehicle>,
+    vehicles: List<VehicleWithStatus>,
     onAddVehicle: () -> Unit,
     onVehicleClick: (Vehicle) -> Unit,
     onDeleteVehicle: (Vehicle) -> Unit = {},
@@ -62,12 +63,13 @@ fun GarageScreen(
                 contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(items = vehicles, key = { it.id }) { vehicle ->
+                items(items = vehicles, key = { it.vehicle.id }) { entry ->
                     VehicleCard(
-                        vehicle = vehicle,
-                        onClick = { onVehicleClick(vehicle) },
-                        onDelete = { onDeleteVehicle(vehicle) },
-                        onEdit = { onEditVehicle(vehicle) }
+                        vehicle = entry.vehicle,
+                        dueStatus = entry.dueStatus,
+                        onClick = { onVehicleClick(entry.vehicle) },
+                        onDelete = { onDeleteVehicle(entry.vehicle) },
+                        onEdit = { onEditVehicle(entry.vehicle) }
                     )
                 }
             }
@@ -78,6 +80,7 @@ fun GarageScreen(
 @Composable
 private fun VehicleCard(
     vehicle: Vehicle,
+    dueStatus: DueStatus,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit
@@ -155,6 +158,20 @@ private fun VehicleCard(
             if (vehicle.vin.isNotBlank()) {
                 Spacer(Modifier.height(8.dp))
                 Text("VIN: ${vehicle.vin}")
+            }
+
+            if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
+                Spacer(Modifier.height(10.dp))
+                val label = if (dueStatus == DueStatus.OVERDUE) "Overdue" else "Due Soon"
+                val color = if (dueStatus == DueStatus.OVERDUE) Color(0xFFB3261E) else Color(0xFF8A6D00)
+                AssistChip(
+                    onClick = {},
+                    label = { Text(label) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = color.copy(alpha = 0.12f),
+                        labelColor = color
+                    )
+                )
             }
         }
     }

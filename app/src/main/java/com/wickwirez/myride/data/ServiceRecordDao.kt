@@ -21,6 +21,19 @@ interface ServiceRecordDao {
     @Query("SELECT COALESCE(SUM(cost), 0.0) FROM service_records WHERE vehicleId = :vehicleId")
     fun getTotalCostForVehicle(vehicleId: Long): Flow<Double>
 
+    @Query(
+        """
+        SELECT * FROM service_records sr1
+        WHERE (sr1.reminderIntervalMiles IS NOT NULL OR sr1.reminderIntervalDays IS NOT NULL)
+        AND sr1.date = (
+            SELECT MAX(sr2.date) FROM service_records sr2
+            WHERE sr2.vehicleId = sr1.vehicleId
+            AND (sr2.reminderIntervalMiles IS NOT NULL OR sr2.reminderIntervalDays IS NOT NULL)
+        )
+        """
+    )
+    fun getLatestReminderRecords(): Flow<List<ServiceRecord>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecord(record: ServiceRecord): Long
 

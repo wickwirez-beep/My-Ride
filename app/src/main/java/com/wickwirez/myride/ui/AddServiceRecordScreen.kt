@@ -32,6 +32,8 @@ fun AddServiceRecordScreen(
     var cost by remember { mutableStateOf("") }
     var shopName by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var reminderMiles by remember { mutableStateOf("") }
+    var reminderDays by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -136,6 +138,30 @@ fun AddServiceRecordScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(Modifier.height(16.dp))
+
+            Text("Remind me next time (optional)", style = MaterialTheme.typography.labelLarge)
+
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = reminderMiles,
+                onValueChange = { reminderMiles = it },
+                label = { Text("Every ___ miles") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            OutlinedTextField(
+                value = reminderDays,
+                onValueChange = { reminderDays = it },
+                label = { Text("Or every ___ days") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
             if (showError) {
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -163,7 +189,9 @@ fun AddServiceRecordScreen(
                                 mileage = parsedMileage,
                                 cost = parsedCost,
                                 shopName = shopName.trim(),
-                                notes = notes.trim()
+                                notes = notes.trim(),
+                                reminderIntervalMiles = reminderMiles.toIntOrNull(),
+                                reminderIntervalDays = reminderDays.toIntOrNull()
                             )
                         )
                     } else {
