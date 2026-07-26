@@ -1,5 +1,7 @@
 package com.wickwirez.myride.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,9 +27,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
+import com.wickwirez.myride.data.VinScanner
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.launch
 
@@ -80,12 +85,41 @@ private fun EditVehicleForm(
     var decoding by remember { mutableStateOf(false) }
     var decodeError by remember { mutableStateOf<String?>(null) }
     var decodeSuccess by remember { mutableStateOf<String?>(null) }
+    var scanning by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
 
     val context = LocalContext.current
+
+    val scanVinLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            scanning = true
+            coroutineScope.launch {
+                val found = VinScanner.scanForVin(bitmap)
+                scanning = false
+                if (found != null) {
+                    vin = found
+                    decodeError = null
+                } else {
+                    decodeError = "Couldn't read a VIN in that photo — try again with the plate closer and well-lit."
+                }
+            }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            scanVinLauncher.launch(null)
+        } else {
+            decodeError = "Camera permission is needed to scan a VIN."
+        }
+    }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -235,6 +269,27 @@ private fun EditVehicleForm(
                 }
                 if (decoding) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                }
+                Spacer(Modifier.width(4.dp))
+                IconButton(
+                    onClick = {
+                        val hasPermission = ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.CAMERA
+                        ) == PackageManager.PERMISSION_GRANTED
+                        if (hasPermission) {
+                            scanVinLauncher.launch(null)
+                        } else {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                    enabled = !scanning
+                ) {
+                    if (scanning) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Icon(Icons.Default.CameraAlt, contentDescription = "Scan VIN with camera")
+                    }
                 }
             }
             if (decodeError != null) {

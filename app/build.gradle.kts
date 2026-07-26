@@ -71,4 +71,5 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 }
