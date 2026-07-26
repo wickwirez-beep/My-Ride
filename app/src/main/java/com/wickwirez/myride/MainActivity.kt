@@ -121,6 +121,9 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onRecordClick = { record ->
                     navController.navigate("edit_service_record/${record.id}")
                 },
+                onDuplicateRecord = { record ->
+                    viewModel.duplicateRecord(record, uiState.vehicle?.currentMileage ?: record.mileage)
+                },
                 onOpenAssistant = { navController.navigate("ai_assistant/$vehicleId") },
                 onBack = { navController.popBackStack() }
             )

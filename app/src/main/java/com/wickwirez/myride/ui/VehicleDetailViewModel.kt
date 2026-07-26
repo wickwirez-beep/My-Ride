@@ -45,6 +45,17 @@ class VehicleDetailViewModel(
         viewModelScope.launch { repository.deleteServiceRecord(record) }
     }
 
+    fun duplicateRecord(record: ServiceRecord, currentMileage: Int) {
+        viewModelScope.launch {
+            val copy = record.copy(
+                id = 0L,
+                date = System.currentTimeMillis(),
+                mileage = currentMileage
+            )
+            repository.addServiceRecord(copy)
+        }
+    }
+
     companion object {
         fun factory(repository: VehicleRepository, vehicleId: Long) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")

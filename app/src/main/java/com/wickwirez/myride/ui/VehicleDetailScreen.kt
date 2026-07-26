@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -45,6 +46,7 @@ fun VehicleDetailScreen(
     dueStatus: DueStatus,
     onAddService: () -> Unit,
     onRecordClick: (ServiceRecord) -> Unit,
+    onDuplicateRecord: (ServiceRecord) -> Unit = {},
     onOpenAssistant: () -> Unit = {},
     onBack: () -> Unit
 ) {
@@ -150,7 +152,11 @@ fun VehicleDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(items = records, key = { it.id }) { record ->
-                        ServiceRecordRow(record, onClick = { onRecordClick(record) })
+                        ServiceRecordRow(
+                            record,
+                            onClick = { onRecordClick(record) },
+                            onDuplicate = { onDuplicateRecord(record) }
+                        )
                     }
                 }
             }
@@ -159,12 +165,25 @@ fun VehicleDetailScreen(
 }
 
 @Composable
-private fun ServiceRecordRow(record: ServiceRecord, onClick: () -> Unit) {
+private fun ServiceRecordRow(record: ServiceRecord, onClick: () -> Unit, onDuplicate: () -> Unit) {
     ElevatedCard(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(modifier = Modifier.padding(14.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(record.type.name.replace('_', ' '), fontWeight = FontWeight.Bold)
-                Text(formatCost(record.cost))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(formatCost(record.cost))
+                    IconButton(onClick = onDuplicate, modifier = Modifier.size(32.dp)) {
+                        Icon(
+                            Icons.Default.ContentCopy,
+                            contentDescription = "Duplicate this entry",
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
             }
             Spacer(Modifier.height(4.dp))
             Text("${formatDate(record.date)} • ${record.mileage} mi")
