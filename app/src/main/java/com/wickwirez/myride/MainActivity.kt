@@ -99,6 +99,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 vehicle = uiState.vehicle,
                 records = uiState.records,
                 totalCost = uiState.totalCost,
+                dueStatus = uiState.dueStatus,
                 onAddService = { navController.navigate("add_service_record/$vehicleId") },
                 onRecordClick = { record ->
                     navController.navigate("edit_service_record/${record.id}")

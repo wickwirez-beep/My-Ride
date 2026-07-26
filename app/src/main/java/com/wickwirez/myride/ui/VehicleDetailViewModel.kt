@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 data class VehicleDetailUiState(
     val vehicle: Vehicle? = null,
     val records: List<ServiceRecord> = emptyList(),
-    val totalCost: Double = 0.0
+    val totalCost: Double = 0.0,
+    val dueStatus: DueStatus = DueStatus.NONE
 )
 
 class VehicleDetailViewModel(
@@ -29,7 +30,15 @@ class VehicleDetailViewModel(
         repository.getRecordsForVehicle(vehicleId),
         repository.getTotalCostForVehicle(vehicleId)
     ) { vehicle, records, totalCost ->
-        VehicleDetailUiState(vehicle, records, totalCost)
+        val reminderRecord = records.firstOrNull {
+            it.reminderIntervalMiles != null || it.reminderIntervalDays != null
+        }
+        val dueStatus = if (vehicle != null) {
+            computeDueStatus(vehicle, reminderRecord, System.currentTimeMillis())
+        } else {
+            DueStatus.NONE
+        }
+        VehicleDetailUiState(vehicle, records, totalCost, dueStatus)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), VehicleDetailUiState())
 
     fun deleteRecord(record: ServiceRecord) {

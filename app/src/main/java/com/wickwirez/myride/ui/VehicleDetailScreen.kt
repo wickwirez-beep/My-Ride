@@ -29,6 +29,7 @@ fun VehicleDetailScreen(
     vehicle: Vehicle?,
     records: List<ServiceRecord>,
     totalCost: Double,
+    dueStatus: DueStatus,
     onAddService: () -> Unit,
     onRecordClick: (ServiceRecord) -> Unit,
     onBack: () -> Unit
@@ -97,6 +98,11 @@ fun VehicleDetailScreen(
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(text = "Total spent: ${formatCost(totalCost)}", fontWeight = FontWeight.Bold)
+
+                if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
+                    Spacer(Modifier.height(8.dp))
+                    DueStatusBeacon(dueStatus)
+                }
             }
 
             HorizontalDivider()
