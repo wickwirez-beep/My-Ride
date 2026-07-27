@@ -35,30 +35,40 @@ object RecallChecker {
                     requestMethod = "GET"
                 }
 
-                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                    val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
-                    val detail = if (!errorBody.isNullOrBlank()) {
-                        try {
-                            JSONObject(errorBody).optString("Message").ifBlank { errorBody }
-                        } catch (e: Exception) {
-                            errorBody
-                        }
-                    } else {
+                val responseCode = connection.responseCode
+
+                // NHTSA's gateway has been observed returning a non-200 status code
+                // while still sending back a genuinely successful JSON body. So read
+                // whichever stream is available and try to parse it as real recall
+                // data first — only treat it as a true failure if that parsing fails.
+                val body = try {
+                    connection.inputStream.bufferedReader().use { it.readText() }
+                } catch (e: Exception) {
+                    connection.errorStream?.bufferedReader()?.use { it.readText() }
+                }
+
+                val parsed = body?.let {
+                    try {
+                        JSONObject(it)
+                    } catch (e: Exception) {
                         null
                     }
+                }
+
+                val resultsArray = parsed?.optJSONArray("results")
+
+                if (resultsArray == null) {
+                    val message = parsed?.optString("Message")
                     return@withContext Result.failure(
                         Exception(
-                            "Request failed (HTTP ${connection.responseCode})" +
-                                if (detail != null) ": $detail" else ""
+                            message?.takeIf { it.isNotBlank() }
+                                ?: "Request failed (HTTP $responseCode)"
                         )
                     )
                 }
 
-                val body = connection.inputStream.bufferedReader().use { it.readText() }
-                val results = JSONObject(body).optJSONArray("results") ?: JSONArray()
-
-                val recalls = (0 until results.length()).map { i ->
-                    val o = results.getJSONObject(i)
+                val recalls = (0 until resultsArray.length()).map { i ->
+                    val o = resultsArray.getJSONObject(i)
                     RecallInfo(
                         campaignNumber = o.optString("NHTSACampaignNumber", ""),
                         component = o.optString("Component", ""),
