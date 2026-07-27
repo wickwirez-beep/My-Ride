@@ -36,8 +36,21 @@ object RecallChecker {
                 }
 
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    val detail = if (!errorBody.isNullOrBlank()) {
+                        try {
+                            JSONObject(errorBody).optString("Message").ifBlank { errorBody }
+                        } catch (e: Exception) {
+                            errorBody
+                        }
+                    } else {
+                        null
+                    }
                     return@withContext Result.failure(
-                        Exception("Request failed (HTTP ${connection.responseCode})")
+                        Exception(
+                            "Request failed (HTTP ${connection.responseCode})" +
+                                if (detail != null) ": $detail" else ""
+                        )
                     )
                 }
 
