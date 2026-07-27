@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
@@ -50,6 +51,7 @@ fun VehicleDetailScreen(
     onDuplicateRecord: (ServiceRecord) -> Unit = {},
     onOpenAssistant: () -> Unit = {},
     onOpenRecalls: () -> Unit = {},
+    onOpenFuelLog: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -77,6 +79,9 @@ fun VehicleDetailScreen(
                         }
                         IconButton(onClick = onOpenRecalls) {
                             Icon(Icons.Default.Warning, contentDescription = "Check for recalls")
+                        }
+                        IconButton(onClick = onOpenFuelLog) {
+                            Icon(Icons.Default.LocalGasStation, contentDescription = "Fuel log")
                         }
                     }
                     IconButton(onClick = onOpenAssistant) {

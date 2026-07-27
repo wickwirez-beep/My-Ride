@@ -1,12 +1,14 @@
 package com.wickwirez.myride.data
 
+import com.wickwirez.myride.model.FuelLog
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.flow.Flow
 
 class VehicleRepository(
     private val vehicleDao: VehicleDao,
-    private val serviceRecordDao: ServiceRecordDao
+    private val serviceRecordDao: ServiceRecordDao,
+    private val fuelLogDao: FuelLogDao
 ) {
     fun getAllVehicles(): Flow<List<Vehicle>> = vehicleDao.getAllVehicles()
 
@@ -45,4 +47,17 @@ class VehicleRepository(
 
     suspend fun deleteServiceRecord(record: ServiceRecord) =
         serviceRecordDao.deleteRecord(record)
+
+    fun getFuelLogsForVehicle(vehicleId: Long): Flow<List<FuelLog>> =
+        fuelLogDao.getLogsForVehicle(vehicleId)
+
+    fun getFuelLogById(logId: Long): Flow<FuelLog?> = fuelLogDao.getLogById(logId)
+
+    suspend fun getAllFuelLogsOnce(): List<FuelLog> = fuelLogDao.getAllLogsOnce()
+
+    suspend fun addFuelLog(log: FuelLog): Long = fuelLogDao.insertLog(log)
+
+    suspend fun updateFuelLog(log: FuelLog) = fuelLogDao.updateLog(log)
+
+    suspend fun deleteFuelLog(log: FuelLog) = fuelLogDao.deleteLog(log)
 }

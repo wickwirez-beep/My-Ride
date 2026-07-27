@@ -17,7 +17,7 @@ class MyRideApplication : Application() {
     private val database: AppDatabase by lazy { AppDatabase.getInstance(this) }
 
     val repository: VehicleRepository by lazy {
-        VehicleRepository(database.vehicleDao(), database.serviceRecordDao())
+        VehicleRepository(database.vehicleDao(), database.serviceRecordDao(), database.fuelLogDao())
     }
 
     override fun onCreate() {

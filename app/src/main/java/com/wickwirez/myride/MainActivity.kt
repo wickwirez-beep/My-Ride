@@ -23,13 +23,19 @@ import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.ui.AboutScreen
 import com.wickwirez.myride.ui.AddServiceRecordScreen
 import com.wickwirez.myride.ui.AddServiceRecordViewModel
+import com.wickwirez.myride.ui.AddFuelLogScreen
+import com.wickwirez.myride.ui.AddFuelLogViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
 import com.wickwirez.myride.ui.AiAssistantScreen
 import com.wickwirez.myride.ui.EditServiceRecordScreen
 import com.wickwirez.myride.ui.EditServiceRecordViewModel
+import com.wickwirez.myride.ui.EditFuelLogScreen
+import com.wickwirez.myride.ui.EditFuelLogViewModel
 import com.wickwirez.myride.ui.EditVehicleScreen
 import com.wickwirez.myride.ui.EditVehicleViewModel
+import com.wickwirez.myride.ui.FuelLogScreen
+import com.wickwirez.myride.ui.FuelLogViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
 import com.wickwirez.myride.ui.RecallScreen
@@ -136,6 +142,74 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 },
                 onOpenAssistant = { navController.navigate("ai_assistant/$vehicleId") },
                 onOpenRecalls = { navController.navigate("recalls/$vehicleId") },
+                onOpenFuelLog = { navController.navigate("fuel_log/$vehicleId") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "fuel_log/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: FuelLogViewModel =
+                viewModel(factory = FuelLogViewModel.factory(repository, vehicleId))
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            FuelLogScreen(
+                uiState = uiState,
+                onAddLog = { navController.navigate("add_fuel_log/$vehicleId") },
+                onLogClick = { entry -> navController.navigate("edit_fuel_log/${entry.log.id}") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "add_fuel_log/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: AddFuelLogViewModel =
+                viewModel(factory = AddFuelLogViewModel.factory(repository))
+            val detailViewModel: FuelLogViewModel =
+                viewModel(factory = FuelLogViewModel.factory(repository, vehicleId))
+            val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
+
+            AddFuelLogScreen(
+                vehicleId = vehicleId,
+                currentMileage = uiState.vehicle?.currentMileage ?: 0,
+                onSave = { log ->
+                    viewModel.saveLog(log) {
+                        navController.popBackStack()
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "edit_fuel_log/{logId}",
+            arguments = listOf(navArgument("logId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val logId = backStackEntry.arguments?.getLong("logId") ?: return@composable
+            val viewModel: EditFuelLogViewModel =
+                viewModel(factory = EditFuelLogViewModel.factory(repository, logId))
+            val log by viewModel.log.collectAsStateWithLifecycle()
+
+            EditFuelLogScreen(
+                log = log,
+                onSave = { updated ->
+                    viewModel.saveLog(updated) {
+                        navController.popBackStack()
+                    }
+                },
+                onDelete = {
+                    log?.let {
+                        viewModel.deleteLog(it) {
+                            navController.popBackStack()
+                        }
+                    }
+                },
                 onBack = { navController.popBackStack() }
             )
         }
