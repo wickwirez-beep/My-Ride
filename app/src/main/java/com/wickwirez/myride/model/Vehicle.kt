@@ -14,5 +14,11 @@ data class Vehicle(
     val trim: String = "",
     val vin: String = "",
     val currentMileage: Int = 0,
-    val photoUri: String? = null
+    val photoUri: String? = null,
+    val oilType: String = "",
+    val oilCapacity: String = "",
+    val airFilterPartNumber: String = "",
+    val sparkPlugType: String = "",
+    val sparkPlugGap: String = "",
+    val specNotes: String = ""
 )

@@ -1,5 +1,6 @@
 package com.wickwirez.myride.data
 
+import com.wickwirez.myride.model.FuelLog
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.ServiceType
 import com.wickwirez.myride.model.Vehicle
@@ -8,9 +9,17 @@ import org.json.JSONObject
 
 object BackupManager {
 
-    data class BackupData(val vehicles: List<Vehicle>, val records: List<ServiceRecord>)
+    data class BackupData(
+        val vehicles: List<Vehicle>,
+        val records: List<ServiceRecord>,
+        val fuelLogs: List<FuelLog>
+    )
 
-    fun buildBackupJson(vehicles: List<Vehicle>, records: List<ServiceRecord>): String {
+    fun buildBackupJson(
+        vehicles: List<Vehicle>,
+        records: List<ServiceRecord>,
+        fuelLogs: List<FuelLog>
+    ): String {
         val vehiclesJson = JSONArray()
         vehicles.forEach { v ->
             vehiclesJson.put(
@@ -24,6 +33,12 @@ object BackupManager {
                     put("vin", v.vin)
                     put("currentMileage", v.currentMileage)
                     put("photoUri", v.photoUri ?: JSONObject.NULL)
+                    put("oilType", v.oilType)
+                    put("oilCapacity", v.oilCapacity)
+                    put("airFilterPartNumber", v.airFilterPartNumber)
+                    put("sparkPlugType", v.sparkPlugType)
+                    put("sparkPlugGap", v.sparkPlugGap)
+                    put("specNotes", v.specNotes)
                 }
             )
         }
@@ -46,10 +61,26 @@ object BackupManager {
             )
         }
 
+        val fuelLogsJson = JSONArray()
+        fuelLogs.forEach { f ->
+            fuelLogsJson.put(
+                JSONObject().apply {
+                    put("id", f.id)
+                    put("vehicleId", f.vehicleId)
+                    put("date", f.date)
+                    put("mileage", f.mileage)
+                    put("gallons", f.gallons)
+                    put("cost", f.cost)
+                    put("notes", f.notes)
+                }
+            )
+        }
+
         val root = JSONObject().apply {
-            put("version", 1)
+            put("version", 2)
             put("vehicles", vehiclesJson)
             put("serviceRecords", recordsJson)
+            put("fuelLogs", fuelLogsJson)
         }
 
         return root.toString(2)
@@ -60,6 +91,7 @@ object BackupManager {
             val root = JSONObject(json)
             val vehiclesJson = root.getJSONArray("vehicles")
             val recordsJson = root.getJSONArray("serviceRecords")
+            val fuelLogsJson = root.optJSONArray("fuelLogs") ?: JSONArray()
 
             val vehicles = (0 until vehiclesJson.length()).map { i ->
                 val o = vehiclesJson.getJSONObject(i)
@@ -72,7 +104,13 @@ object BackupManager {
                     trim = o.optString("trim", ""),
                     vin = o.optString("vin", ""),
                     currentMileage = o.optInt("currentMileage", 0),
-                    photoUri = if (o.isNull("photoUri")) null else o.getString("photoUri")
+                    photoUri = if (o.isNull("photoUri")) null else o.getString("photoUri"),
+                    oilType = o.optString("oilType", ""),
+                    oilCapacity = o.optString("oilCapacity", ""),
+                    airFilterPartNumber = o.optString("airFilterPartNumber", ""),
+                    sparkPlugType = o.optString("sparkPlugType", ""),
+                    sparkPlugGap = o.optString("sparkPlugGap", ""),
+                    specNotes = o.optString("specNotes", "")
                 )
             }
 
@@ -100,7 +138,20 @@ object BackupManager {
                 )
             }
 
-            BackupData(vehicles, records)
+            val fuelLogs = (0 until fuelLogsJson.length()).map { i ->
+                val o = fuelLogsJson.getJSONObject(i)
+                FuelLog(
+                    id = o.getLong("id"),
+                    vehicleId = o.getLong("vehicleId"),
+                    date = o.getLong("date"),
+                    mileage = o.getInt("mileage"),
+                    gallons = o.optDouble("gallons", 0.0),
+                    cost = o.optDouble("cost", 0.0),
+                    notes = o.optString("notes", "")
+                )
+            }
+
+            BackupData(vehicles, records, fuelLogs)
         } catch (e: Exception) {
             null
         }

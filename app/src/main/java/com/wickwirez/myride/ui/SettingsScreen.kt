@@ -40,12 +40,14 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
             coroutineScope.launch {
                 val vehicles = repository.getAllVehiclesOnce()
                 val records = repository.getAllRecordsOnce()
-                val json = BackupManager.buildBackupJson(vehicles, records)
+                val fuelLogs = repository.getAllFuelLogsOnce()
+                val json = BackupManager.buildBackupJson(vehicles, records, fuelLogs)
                 withContext(Dispatchers.IO) {
                     context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
                 }
                 working = false
-                backupStatus = "Backup saved: ${vehicles.size} vehicle(s), ${records.size} record(s)."
+                backupStatus = "Backup saved: ${vehicles.size} vehicle(s), " +
+                    "${records.size} record(s), ${fuelLogs.size} fuel log(s)."
             }
         }
     }
@@ -64,7 +66,9 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                 if (data != null) {
                     data.vehicles.forEach { repository.addVehicle(it) }
                     data.records.forEach { repository.addServiceRecord(it) }
-                    backupStatus = "Restored ${data.vehicles.size} vehicle(s), ${data.records.size} record(s)."
+                    data.fuelLogs.forEach { repository.addFuelLog(it) }
+                    backupStatus = "Restored ${data.vehicles.size} vehicle(s), " +
+                        "${data.records.size} record(s), ${data.fuelLogs.size} fuel log(s)."
                 } else {
                     backupStatus = "That file couldn't be read as a My Ride backup."
                 }

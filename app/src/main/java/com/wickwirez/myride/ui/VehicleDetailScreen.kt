@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.Print
@@ -52,6 +53,7 @@ fun VehicleDetailScreen(
     onOpenAssistant: () -> Unit = {},
     onOpenRecalls: () -> Unit = {},
     onOpenFuelLog: () -> Unit = {},
+    onOpenSpecs: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -82,6 +84,9 @@ fun VehicleDetailScreen(
                         }
                         IconButton(onClick = onOpenFuelLog) {
                             Icon(Icons.Default.LocalGasStation, contentDescription = "Fuel log")
+                        }
+                        IconButton(onClick = onOpenSpecs) {
+                            Icon(Icons.Default.Build, contentDescription = "The Parts Store")
                         }
                     }
                     IconButton(onClick = onOpenAssistant) {

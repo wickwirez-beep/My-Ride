@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,7 +43,9 @@ import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
+import com.wickwirez.myride.ui.VehicleSpecsScreen
 import com.wickwirez.myride.ui.theme.MyRideTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -143,6 +146,26 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onOpenAssistant = { navController.navigate("ai_assistant/$vehicleId") },
                 onOpenRecalls = { navController.navigate("recalls/$vehicleId") },
                 onOpenFuelLog = { navController.navigate("fuel_log/$vehicleId") },
+                onOpenSpecs = { navController.navigate("vehicle_specs/$vehicleId") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "vehicle_specs/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: VehicleDetailViewModel =
+                viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val coroutineScope = rememberCoroutineScope()
+
+            VehicleSpecsScreen(
+                vehicle = uiState.vehicle,
+                onSave = { updated ->
+                    coroutineScope.launch { repository.updateVehicle(updated) }
+                },
                 onBack = { navController.popBackStack() }
             )
         }
