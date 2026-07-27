@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wickwirez.myride.data.VehicleRepository
+import com.wickwirez.myride.ui.AboutScreen
 import com.wickwirez.myride.ui.AddServiceRecordScreen
 import com.wickwirez.myride.ui.AddServiceRecordViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
@@ -86,7 +87,15 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         }
 
         composable("settings") {
-            SettingsScreen(repository = repository, onBack = { navController.popBackStack() })
+            SettingsScreen(
+                repository = repository,
+                onOpenAbout = { navController.navigate("about") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("about") {
+            AboutScreen(onBack = { navController.popBackStack() })
         }
 
         composable("add_vehicle") {

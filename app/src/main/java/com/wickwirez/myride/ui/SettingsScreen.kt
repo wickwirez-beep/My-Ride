@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(repository: VehicleRepository, onBack: () -> Unit) {
+fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -167,6 +167,13 @@ fun SettingsScreen(repository: VehicleRepository, onBack: () -> Unit) {
             if (backupStatus != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(backupStatus!!, color = MaterialTheme.colorScheme.primary)
+            }
+
+            Spacer(Modifier.height(32.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(16.dp))
+            TextButton(onClick = onOpenAbout) {
+                Text("About My Ride")
             }
         }
     }
