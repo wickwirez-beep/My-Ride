@@ -60,6 +60,17 @@ fun AboutScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(24.dp))
+            Text(
+                "Created and built by Wick",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "Built with Termux, GitHub Actions, and Kotlin/Jetpack Compose",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
