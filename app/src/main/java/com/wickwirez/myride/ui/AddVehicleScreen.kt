@@ -2,6 +2,7 @@ package com.wickwirez.myride.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -27,12 +28,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
 import com.wickwirez.myride.data.VinScanner
 import com.wickwirez.myride.model.Vehicle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,29 +63,51 @@ fun AddVehicleScreen(
 
     val context = LocalContext.current
 
+    var scanPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
     val scanVinLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        val uri = scanPhotoUri
+        if (success && uri != null) {
             scanning = true
             coroutineScope.launch {
-                val found = VinScanner.scanForVin(bitmap)
-                scanning = false
-                if (found != null) {
-                    vin = found
-                    decodeError = null
+                val bitmap = withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { stream ->
+                        BitmapFactory.decodeStream(stream)
+                    }
+                }
+                if (bitmap != null) {
+                    val found = VinScanner.scanForVin(bitmap)
+                    scanning = false
+                    if (found != null) {
+                        vin = found
+                        decodeError = null
+                    } else {
+                        decodeError = "Couldn't read a VIN in that photo — try again with the plate closer and well-lit."
+                    }
                 } else {
-                    decodeError = "Couldn't read a VIN in that photo — try again with the plate closer and well-lit."
+                    scanning = false
+                    decodeError = "Couldn't load that photo."
                 }
             }
+        } else {
+            scanning = false
         }
+    }
+
+    fun launchVinScan() {
+        val file = File(context.cacheDir, "vin_scan_${System.currentTimeMillis()}.jpg")
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        scanPhotoUri = uri
+        scanVinLauncher.launch(uri)
     }
 
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            scanVinLauncher.launch(null)
+            launchVinScan()
         } else {
             decodeError = "Camera permission is needed to scan a VIN."
         }
@@ -241,7 +268,7 @@ fun AddVehicleScreen(
                             Manifest.permission.CAMERA
                         ) == PackageManager.PERMISSION_GRANTED
                         if (hasPermission) {
-                            scanVinLauncher.launch(null)
+                            launchVinScan()
                         } else {
                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                         }
