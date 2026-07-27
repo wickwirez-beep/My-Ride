@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.LocalGasStation
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
@@ -30,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -61,8 +63,13 @@ fun VehicleDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        if (vehicle == null) "Vehicle"
-                        else vehicle.nickname.ifBlank { "${vehicle.year} ${vehicle.make} ${vehicle.model}" }
+                        text = if (vehicle == null) {
+                            "Vehicle"
+                        } else {
+                            vehicle.nickname.ifBlank { "${vehicle.year} ${vehicle.make} ${vehicle.model}" }
+                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
@@ -71,26 +78,54 @@ fun VehicleDetailScreen(
                     }
                 },
                 actions = {
-                    if (vehicle != null) {
-                        val context = LocalContext.current
-                        IconButton(onClick = { ShareHelper.shareVehicleSummary(context, vehicle, records) }) {
-                            Icon(Icons.Default.Share, contentDescription = "Share vehicle summary")
-                        }
-                        IconButton(onClick = { PrintHelper.printServiceHistory(context, vehicle, records) }) {
-                            Icon(Icons.Default.Print, contentDescription = "Print service history")
-                        }
-                        IconButton(onClick = onOpenRecalls) {
-                            Icon(Icons.Default.Warning, contentDescription = "Check for recalls")
-                        }
-                        IconButton(onClick = onOpenFuelLog) {
-                            Icon(Icons.Default.LocalGasStation, contentDescription = "Fuel log")
-                        }
-                        IconButton(onClick = onOpenSpecs) {
-                            Icon(Icons.Default.Build, contentDescription = "The Parts Store")
-                        }
-                    }
                     IconButton(onClick = onOpenAssistant) {
                         Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "AI Assistant")
+                    }
+
+                    if (vehicle != null) {
+                        val context = LocalContext.current
+                        var menuExpanded by remember { mutableStateOf(false) }
+
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More")
+                        }
+
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Fuel Log") },
+                                leadingIcon = { Icon(Icons.Default.LocalGasStation, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenFuelLog() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("The Parts Store") },
+                                leadingIcon = { Icon(Icons.Default.Build, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenSpecs() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Check for Recalls") },
+                                leadingIcon = { Icon(Icons.Default.Warning, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenRecalls() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Print Service History") },
+                                leadingIcon = { Icon(Icons.Default.Print, contentDescription = null) },
+                                onClick = {
+                                    menuExpanded = false
+                                    PrintHelper.printServiceHistory(context, vehicle, records)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Share Summary") },
+                                leadingIcon = { Icon(Icons.Default.Share, contentDescription = null) },
+                                onClick = {
+                                    menuExpanded = false
+                                    ShareHelper.shareVehicleSummary(context, vehicle, records)
+                                }
+                            )
+                        }
                     }
                 }
             )
