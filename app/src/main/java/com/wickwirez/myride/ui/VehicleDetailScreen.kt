@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ fun VehicleDetailScreen(
     onRecordClick: (ServiceRecord) -> Unit,
     onDuplicateRecord: (ServiceRecord) -> Unit = {},
     onOpenAssistant: () -> Unit = {},
+    onOpenRecalls: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -72,6 +74,9 @@ fun VehicleDetailScreen(
                         }
                         IconButton(onClick = { PrintHelper.printServiceHistory(context, vehicle, records) }) {
                             Icon(Icons.Default.Print, contentDescription = "Print service history")
+                        }
+                        IconButton(onClick = onOpenRecalls) {
+                            Icon(Icons.Default.Warning, contentDescription = "Check for recalls")
                         }
                     }
                     IconButton(onClick = onOpenAssistant) {

@@ -32,6 +32,7 @@ import com.wickwirez.myride.ui.EditVehicleScreen
 import com.wickwirez.myride.ui.EditVehicleViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
+import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
@@ -134,6 +135,22 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                     viewModel.duplicateRecord(record, uiState.vehicle?.currentMileage ?: record.mileage)
                 },
                 onOpenAssistant = { navController.navigate("ai_assistant/$vehicleId") },
+                onOpenRecalls = { navController.navigate("recalls/$vehicleId") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "recalls/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: VehicleDetailViewModel =
+                viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            RecallScreen(
+                vehicle = uiState.vehicle,
                 onBack = { navController.popBackStack() }
             )
         }
