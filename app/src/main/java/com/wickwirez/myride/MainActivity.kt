@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +46,7 @@ import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
 import com.wickwirez.myride.ui.VehicleSpecsScreen
+import com.wickwirez.myride.ui.VinScannerScreen
 import com.wickwirez.myride.ui.theme.MyRideTheme
 import kotlinx.coroutines.launch
 
@@ -111,14 +114,33 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         composable("add_vehicle") {
             val viewModel: AddVehicleViewModel =
                 viewModel(factory = AddVehicleViewModel.factory(repository))
+            val scannedVin by navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.getStateFlow<String?>("scanned_vin", null)
+                ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(null) }
 
             AddVehicleScreen(
+                scannedVin = scannedVin,
+                onScanVinRequest = { navController.navigate("vin_scanner") },
+                onScannedVinConsumed = {
+                    navController.currentBackStackEntry?.savedStateHandle?.set<String?>("scanned_vin", null)
+                },
                 onSave = { vehicle ->
                     viewModel.saveVehicle(vehicle) {
                         navController.popBackStack()
                     }
                 },
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("vin_scanner") {
+            VinScannerScreen(
+                onVinFound = { vin ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set("scanned_vin", vin)
+                    navController.popBackStack()
+                },
+                onCancel = { navController.popBackStack() }
             )
         }
 
@@ -327,9 +349,17 @@ private fun MyRideNavHost(repository: VehicleRepository) {
             val viewModel: EditVehicleViewModel =
                 viewModel(factory = EditVehicleViewModel.factory(repository, vehicleId))
             val vehicle by viewModel.vehicle.collectAsStateWithLifecycle()
+            val scannedVin by backStackEntry.savedStateHandle
+                .getStateFlow<String?>("scanned_vin", null)
+                .collectAsStateWithLifecycle()
 
             EditVehicleScreen(
                 vehicle = vehicle,
+                scannedVin = scannedVin,
+                onScanVinRequest = { navController.navigate("vin_scanner") },
+                onScannedVinConsumed = {
+                    backStackEntry.savedStateHandle.set<String?>("scanned_vin", null)
+                },
                 onSave = { updated ->
                     viewModel.saveVehicle(updated) {
                         navController.popBackStack()
