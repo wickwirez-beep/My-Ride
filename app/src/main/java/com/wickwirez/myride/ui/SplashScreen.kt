@@ -34,7 +34,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(alpha.value),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Fit
         )
     }
 }
