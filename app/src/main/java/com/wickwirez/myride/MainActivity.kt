@@ -43,6 +43,7 @@ import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
 import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
+import com.wickwirez.myride.ui.SplashScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
 import com.wickwirez.myride.ui.VehicleSpecsScreen
@@ -78,7 +79,17 @@ class MainActivity : ComponentActivity() {
 private fun MyRideNavHost(repository: VehicleRepository) {
     val navController: NavHostController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "garage") {
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") {
+            SplashScreen(
+                onFinished = {
+                    navController.navigate("garage") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
+
 
         composable("garage") {
             val viewModel: GarageViewModel =
