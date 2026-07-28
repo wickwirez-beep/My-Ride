@@ -1,5 +1,6 @@
 package com.wickwirez.myride.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,8 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.wickwirez.myride.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -58,7 +61,19 @@ fun FuelLogScreen(
 
             if (uiState.logs.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No fill-ups logged yet. Tap Log Fill-Up to add the first one.")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.fuel_pump_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(80.dp)
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            "No fill-ups logged yet. Tap Log Fill-Up to add the first one.",
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp)
+                        )
+                    }
                 }
             } else {
                 LazyColumn(

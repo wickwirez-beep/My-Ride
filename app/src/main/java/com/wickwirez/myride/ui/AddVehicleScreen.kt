@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.wickwirez.myride.R
 import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
 import com.wickwirez.myride.model.Vehicle
@@ -212,7 +215,11 @@ fun AddVehicleScreen(
                 }
                 Spacer(Modifier.width(4.dp))
                 IconButton(onClick = onScanVinRequest) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = "Scan VIN with camera")
+                    Image(
+                        painter = painterResource(id = R.drawable.nav_scan_vin),
+                        contentDescription = "Scan VIN with camera",
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
             }
             if (decodeError != null) {

@@ -35,6 +35,8 @@ object BackupManager {
                     put("photoUri", v.photoUri ?: JSONObject.NULL)
                     put("oilType", v.oilType)
                     put("oilCapacity", v.oilCapacity)
+                    put("oilFilterBrand", v.oilFilterBrand)
+                    put("oilFilterPartNumber", v.oilFilterPartNumber)
                     put("airFilterPartNumber", v.airFilterPartNumber)
                     put("sparkPlugType", v.sparkPlugType)
                     put("sparkPlugGap", v.sparkPlugGap)
@@ -107,6 +109,8 @@ object BackupManager {
                     photoUri = if (o.isNull("photoUri")) null else o.getString("photoUri"),
                     oilType = o.optString("oilType", ""),
                     oilCapacity = o.optString("oilCapacity", ""),
+                    oilFilterBrand = o.optString("oilFilterBrand", ""),
+                    oilFilterPartNumber = o.optString("oilFilterPartNumber", ""),
                     airFilterPartNumber = o.optString("airFilterPartNumber", ""),
                     sparkPlugType = o.optString("sparkPlugType", ""),
                     sparkPlugGap = o.optString("sparkPlugGap", ""),

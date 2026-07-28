@@ -17,6 +17,8 @@ data class Vehicle(
     val photoUri: String? = null,
     val oilType: String = "",
     val oilCapacity: String = "",
+    val oilFilterBrand: String = "",
+    val oilFilterPartNumber: String = "",
     val airFilterPartNumber: String = "",
     val sparkPlugType: String = "",
     val sparkPlugGap: String = "",

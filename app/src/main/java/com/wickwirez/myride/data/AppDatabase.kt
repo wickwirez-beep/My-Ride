@@ -11,7 +11,7 @@ import com.wickwirez.myride.model.Vehicle
 
 @Database(
     entities = [Vehicle::class, ServiceRecord::class, FuelLog::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

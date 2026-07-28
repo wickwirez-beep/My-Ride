@@ -1,16 +1,29 @@
 package com.wickwirez.myride.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.wickwirez.myride.R
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.ServiceType
 import java.text.SimpleDateFormat
@@ -93,6 +106,7 @@ fun AddServiceRecordScreen(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Date") },
+                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
                 trailingIcon = {
                     TextButton(onClick = { showDatePicker = true }) { Text("Change") }
                 },
@@ -105,6 +119,7 @@ fun AddServiceRecordScreen(
                 value = mileage,
                 onValueChange = { mileage = it },
                 label = { Text("Mileage") },
+                leadingIcon = { Icon(Icons.Default.Speed, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -115,6 +130,7 @@ fun AddServiceRecordScreen(
                 value = cost,
                 onValueChange = { cost = it },
                 label = { Text("Cost (Optional)") },
+                leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -125,6 +141,7 @@ fun AddServiceRecordScreen(
                 value = shopName,
                 onValueChange = { shopName = it },
                 label = { Text("Shop (Optional)") },
+                leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -134,20 +151,22 @@ fun AddServiceRecordScreen(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes (Optional)") },
+                leadingIcon = { Icon(Icons.Default.EditNote, contentDescription = null) },
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Remind me next time (optional)", style = MaterialTheme.typography.labelLarge)
+            SectionHeader(R.drawable.nav_reminders, "Remind me next time (optional)")
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = reminderMiles,
                 onValueChange = { reminderMiles = it },
                 label = { Text("Every ___ miles") },
+                leadingIcon = { Icon(Icons.Default.Speed, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -158,6 +177,7 @@ fun AddServiceRecordScreen(
                 value = reminderDays,
                 onValueChange = { reminderDays = it },
                 label = { Text("Or every ___ days") },
+                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -173,33 +193,41 @@ fun AddServiceRecordScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    val parsedMileage = mileage.toIntOrNull()
-                    val parsedCost = cost.toDoubleOrNull() ?: 0.0
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .clickable {
+                        val parsedMileage = mileage.toIntOrNull()
+                        val parsedCost = cost.toDoubleOrNull() ?: 0.0
 
-                    if (parsedMileage != null) {
-                        showError = false
-                        onSave(
-                            ServiceRecord(
-                                vehicleId = vehicleId,
-                                type = type,
-                                date = dateMillis,
-                                mileage = parsedMileage,
-                                cost = parsedCost,
-                                shopName = shopName.trim(),
-                                notes = notes.trim(),
-                                reminderIntervalMiles = reminderMiles.toIntOrNull(),
-                                reminderIntervalDays = reminderDays.toIntOrNull()
+                        if (parsedMileage != null) {
+                            showError = false
+                            onSave(
+                                ServiceRecord(
+                                    vehicleId = vehicleId,
+                                    type = type,
+                                    date = dateMillis,
+                                    mileage = parsedMileage,
+                                    cost = parsedCost,
+                                    shopName = shopName.trim(),
+                                    notes = notes.trim(),
+                                    reminderIntervalMiles = reminderMiles.toIntOrNull(),
+                                    reminderIntervalDays = reminderDays.toIntOrNull()
+                                )
                             )
-                        )
-                    } else {
-                        showError = true
+                        } else {
+                            showError = true
+                        }
                     }
-                }
             ) {
-                Text("Save Service Record")
+                Image(
+                    painter = painterResource(id = R.drawable.save_button_large),
+                    contentDescription = "Save Service Record",
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.FillBounds
+                )
             }
 
             Spacer(Modifier.height(24.dp))

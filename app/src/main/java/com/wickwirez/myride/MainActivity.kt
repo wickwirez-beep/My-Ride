@@ -9,6 +9,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +86,26 @@ class MainActivity : ComponentActivity() {
 private fun MyRideNavHost(repository: VehicleRepository) {
     val navController: NavHostController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "splash") {
+    NavHost(
+        navController = navController,
+        startDestination = "splash",
+        enterTransition = {
+            slideInHorizontally(initialOffsetX = { it / 3 }, animationSpec = tween(280)) +
+                fadeIn(animationSpec = tween(280))
+        },
+        exitTransition = {
+            slideOutHorizontally(targetOffsetX = { -it / 4 }, animationSpec = tween(280)) +
+                fadeOut(animationSpec = tween(280))
+        },
+        popEnterTransition = {
+            slideInHorizontally(initialOffsetX = { -it / 4 }, animationSpec = tween(280)) +
+                fadeIn(animationSpec = tween(280))
+        },
+        popExitTransition = {
+            slideOutHorizontally(targetOffsetX = { it / 3 }, animationSpec = tween(280)) +
+                fadeOut(animationSpec = tween(280))
+        }
+    ) {
         composable("splash") {
             SplashScreen(
                 onFinished = {
