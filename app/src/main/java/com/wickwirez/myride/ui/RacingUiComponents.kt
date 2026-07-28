@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -26,6 +27,168 @@ import com.wickwirez.myride.R
 // Small icon badge + bold red all-caps label, used to head each section
 // on The Parts Store and similar screens. Optionally shows a dimmed photo
 // backdrop behind the whole section (e.g. oil pouring behind the Oil section).
+// Full section panel: background photo spans the WHOLE card (header + the
+// fields inside it), with a glowing red border around the entire panel —
+// not just a small strip behind the header row.
+@Composable
+fun SectionCard(
+    icon: ImageVector,
+    title: String,
+    backgroundImageRes: Int? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp))
+    ) {
+        Box(modifier = Modifier.matchParentSize().background(Color(0xFF120E0E)))
+
+        if (backgroundImageRes != null) {
+            Image(
+                painter = painterResource(id = backgroundImageRes),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize().alpha(0.28f),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color(0xB3000000))
+            )
+        }
+
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1A1414))
+                        .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    title.uppercase(),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.sp
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            content()
+        }
+    }
+}
+
+// Field colors with a vivid, persistent red glow border (not just the
+// default faint Material3 outline) — use on every OutlinedTextField.
+@Composable
+fun glowFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.65f),
+    focusedContainerColor = Color(0x30000000),
+    unfocusedContainerColor = Color(0x30000000),
+    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+)
+
+// Thin glowing red vertical accent strip down the screen edge, matching
+// the reference art's persistent side-glow motif.
+@Composable
+fun EdgeGlow(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .width(4.dp)
+            .fillMaxHeight()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                        Color.Transparent
+                    )
+                )
+            )
+    )
+}
+
+// Field with a red caps caption ABOVE it and an icon badge OUTSIDE to the
+// left — matches the reference layout exactly, rather than Material3's
+// default floating inline label.
+@Composable
+fun LabeledIconField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    iconRes: Int? = null,
+    placeholder: String? = null,
+    trailingText: String? = null,
+    keyboardType: androidx.compose.ui.text.input.KeyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+    readOnly: Boolean = false,
+    trailingAction: (@Composable () -> Unit)? = null,
+    minLines: Int = 1
+) {
+    Column(modifier = modifier) {
+        Text(
+            label.uppercase(),
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            letterSpacing = 0.5.sp
+        )
+        Spacer(Modifier.height(4.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (icon != null || iconRes != null) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1A1414))
+                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (icon != null) {
+                        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                    } else if (iconRes != null) {
+                        Image(painter = painterResource(id = iconRes), contentDescription = null, modifier = Modifier.size(26.dp))
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
+            }
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                placeholder = placeholder?.let { { Text(it, color = Color.White.copy(alpha = 0.35f)) } },
+                readOnly = readOnly,
+                trailingIcon = when {
+                    trailingText != null -> {
+                        { Text(trailingText, color = Color.White.copy(alpha = 0.6f)) }
+                    }
+                    trailingAction != null -> trailingAction
+                    else -> null
+                },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = keyboardType),
+                minLines = minLines,
+                colors = glowFieldColors(),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
 @Composable
 fun SectionHeader(iconRes: Int, title: String, backgroundImageRes: Int? = null) {
     Box(

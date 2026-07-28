@@ -19,10 +19,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.wickwirez.myride.R
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.ServiceType
@@ -63,174 +66,178 @@ fun AddServiceRecordScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(scrollState)
-                .padding(20.dp)
-        ) {
+        Row(modifier = Modifier.fillMaxSize().padding(padding)) {
+            EdgeGlow()
 
-            ExposedDropdownMenuBox(
-                expanded = typeMenuExpanded,
-                onExpandedChange = { typeMenuExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value = type.name.replace('_', ' '),
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Service Type") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeMenuExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                )
-                ExposedDropdownMenu(
-                    expanded = typeMenuExpanded,
-                    onDismissRequest = { typeMenuExpanded = false }
-                ) {
-                    ServiceType.entries.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option.name.replace('_', ' ')) },
-                            onClick = {
-                                type = option
-                                typeMenuExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = SimpleDateFormat("MMM d, yyyy", Locale.US).format(dateMillis),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Date") },
-                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
-                trailingIcon = {
-                    TextButton(onClick = { showDatePicker = true }) { Text("Change") }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = mileage,
-                onValueChange = { mileage = it },
-                label = { Text("Mileage") },
-                leadingIcon = { Icon(Icons.Default.Speed, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = cost,
-                onValueChange = { cost = it },
-                label = { Text("Cost (Optional)") },
-                leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = shopName,
-                onValueChange = { shopName = it },
-                label = { Text("Shop (Optional)") },
-                leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
-                label = { Text("Notes (Optional)") },
-                leadingIcon = { Icon(Icons.Default.EditNote, contentDescription = null) },
-                minLines = 2,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            SectionHeader(R.drawable.nav_reminders, "Remind me next time (optional)")
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = reminderMiles,
-                onValueChange = { reminderMiles = it },
-                label = { Text("Every ___ miles") },
-                leadingIcon = { Icon(Icons.Default.Speed, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            OutlinedTextField(
-                value = reminderDays,
-                onValueChange = { reminderDays = it },
-                label = { Text("Or every ___ days") },
-                leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (showError) {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Please enter a valid mileage.",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .clickable {
-                        val parsedMileage = mileage.toIntOrNull()
-                        val parsedCost = cost.toDoubleOrNull() ?: 0.0
-
-                        if (parsedMileage != null) {
-                            showError = false
-                            onSave(
-                                ServiceRecord(
-                                    vehicleId = vehicleId,
-                                    type = type,
-                                    date = dateMillis,
-                                    mileage = parsedMileage,
-                                    cost = parsedCost,
-                                    shopName = shopName.trim(),
-                                    notes = notes.trim(),
-                                    reminderIntervalMiles = reminderMiles.toIntOrNull(),
-                                    reminderIntervalDays = reminderDays.toIntOrNull()
-                                )
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    "SERVICE TYPE",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    letterSpacing = 0.5.sp
+                )
+                Spacer(Modifier.height(4.dp))
+                ExposedDropdownMenuBox(
+                    expanded = typeMenuExpanded,
+                    onExpandedChange = { typeMenuExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = type.name.replace('_', ' '),
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeMenuExpanded) },
+                        colors = glowFieldColors(),
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = typeMenuExpanded,
+                        onDismissRequest = { typeMenuExpanded = false }
+                    ) {
+                        ServiceType.entries.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option.name.replace('_', ' ')) },
+                                onClick = {
+                                    type = option
+                                    typeMenuExpanded = false
+                                }
                             )
-                        } else {
-                            showError = true
                         }
                     }
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.save_button_large),
-                    contentDescription = "Save Service Record",
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
+                }
 
-            Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(14.dp))
+
+                LabeledIconField(
+                    label = "Date",
+                    value = SimpleDateFormat("MMM d, yyyy", Locale.US).format(dateMillis),
+                    onValueChange = {},
+                    icon = Icons.Default.CalendarToday,
+                    readOnly = true,
+                    trailingAction = { TextButton(onClick = { showDatePicker = true }) { Text("Change") } },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                LabeledIconField(
+                    label = "Mileage",
+                    value = mileage,
+                    onValueChange = { mileage = it },
+                    icon = Icons.Default.Speed,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                LabeledIconField(
+                    label = "Cost (Optional)",
+                    value = cost,
+                    onValueChange = { cost = it },
+                    icon = Icons.Default.AttachMoney,
+                    keyboardType = KeyboardType.Decimal,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                LabeledIconField(
+                    label = "Shop (Optional)",
+                    value = shopName,
+                    onValueChange = { shopName = it },
+                    icon = Icons.Default.Store,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(14.dp))
+
+                LabeledIconField(
+                    label = "Notes (Optional)",
+                    value = notes,
+                    onValueChange = { notes = it },
+                    icon = Icons.Default.EditNote,
+                    minLines = 2,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                SectionCard(Icons.Default.Notifications, "Remind me next time (optional)", null) {
+                    LabeledIconField(
+                        label = "Every ___ miles",
+                        value = reminderMiles,
+                        onValueChange = { reminderMiles = it },
+                        keyboardType = KeyboardType.Number,
+                        trailingText = "miles",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    LabeledIconField(
+                        label = "Or every ___ days",
+                        value = reminderDays,
+                        onValueChange = { reminderDays = it },
+                        keyboardType = KeyboardType.Number,
+                        trailingText = "days",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                if (showError) {
+                    Text(
+                        "Please enter a valid mileage.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable {
+                            val parsedMileage = mileage.toIntOrNull()
+                            val parsedCost = cost.toDoubleOrNull() ?: 0.0
+
+                            if (parsedMileage != null) {
+                                showError = false
+                                onSave(
+                                    ServiceRecord(
+                                        vehicleId = vehicleId,
+                                        type = type,
+                                        date = dateMillis,
+                                        mileage = parsedMileage,
+                                        cost = parsedCost,
+                                        shopName = shopName.trim(),
+                                        notes = notes.trim(),
+                                        reminderIntervalMiles = reminderMiles.toIntOrNull(),
+                                        reminderIntervalDays = reminderDays.toIntOrNull()
+                                    )
+                                )
+                            } else {
+                                showError = true
+                            }
+                        }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.save_button_large),
+                        contentDescription = "Save Service Record",
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+            }
         }
     }
 

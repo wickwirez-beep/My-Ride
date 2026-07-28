@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -159,10 +160,30 @@ private fun VehicleCard(
         visible = appeared,
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
     ) {
-        GlowCard(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onClick
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(0xFF161414))
+                .border(1.dp, Color(0xFF3A3232), RoundedCornerShape(14.dp))
+                .clickable(onClick = onClick)
         ) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .fillMaxHeight()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary,
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+
             Column(modifier = Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
