@@ -1,5 +1,3 @@
-package com.wickwirez.myride.ui
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
