@@ -76,11 +76,10 @@ fun AddServiceRecordScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    "SERVICE TYPE",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                    letterSpacing = 0.5.sp
+                    "Service Type",
+                    color = Color.White.copy(alpha = 0.85f),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 13.sp
                 )
                 Spacer(Modifier.height(4.dp))
                 ExposedDropdownMenuBox(
