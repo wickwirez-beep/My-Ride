@@ -1,3 +1,4 @@
+
 package com.wickwirez.myride.ui
 
 import androidx.compose.foundation.Image
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wickwirez.myride.R
+
 
 // Small icon badge + bold red all-caps label, used to head each section
 // on The Parts Store and similar screens. Optionally shows a dimmed photo
