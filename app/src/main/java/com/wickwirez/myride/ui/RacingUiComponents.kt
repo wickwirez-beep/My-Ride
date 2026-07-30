@@ -310,7 +310,7 @@ fun CheckeredFlagButton(
             painter = painterResource(id = R.drawable.red_glow_button),
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.Crop
         )
         Text(
             text.uppercase(),
