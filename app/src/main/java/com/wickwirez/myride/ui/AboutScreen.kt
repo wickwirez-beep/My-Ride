@@ -45,7 +45,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 painter = painterResource(id = R.drawable.flag_wrenches_badge),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(120.dp),
                 contentScale = ContentScale.Fit
             )
             Spacer(Modifier.height(12.dp))
