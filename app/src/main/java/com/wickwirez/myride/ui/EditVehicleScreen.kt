@@ -166,7 +166,7 @@ private fun EditVehicleForm(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if (photoUri != null) {
+                if (photoUri != null && java.io.File(photoUri).exists()) {
                     AsyncImage(
                         model = photoUri,
                         contentDescription = "Vehicle photo",
