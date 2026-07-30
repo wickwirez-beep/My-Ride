@@ -51,6 +51,7 @@ import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.SplashScreen
 import com.wickwirez.myride.ui.VehicleDetailScreen
+import com.wickwirez.myride.ui.DocumentsScreen
 import com.wickwirez.myride.ui.VehicleDetailViewModel
 import com.wickwirez.myride.ui.VehicleSpecsScreen
 import com.wickwirez.myride.ui.VinScannerScreen
