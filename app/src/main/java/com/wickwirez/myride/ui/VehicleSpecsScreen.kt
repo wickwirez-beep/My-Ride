@@ -171,24 +171,6 @@ private fun VehicleSpecsForm(
 
                 Spacer(Modifier.height(4.dp))
 
-                CheckeredFlagButton(
-                    text = "Save Specs",
-                    onClick = {
-                        onSave(
-                            vehicle.copy(
-                                oilType = oilType.trim(),
-                                oilCapacity = oilCapacity.trim(),
-                                oilFilterBrand = oilFilterBrand.trim(),
-                                oilFilterPartNumber = oilFilterPartNumber.trim(),
-                                airFilterPartNumber = airFilterPartNumber.trim(),
-                                sparkPlugType = sparkPlugType.trim(),
-                                sparkPlugGap = sparkPlugGap.trim(),
-                                specNotes = specNotes.trim()
-                            )
-                        )
-                        saved = true
-                    }
-                )
 
                 if (saved) {
                     Text("Saved.", color = MaterialTheme.colorScheme.primary)
