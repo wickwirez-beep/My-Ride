@@ -8,10 +8,11 @@ import androidx.room.TypeConverters
 import com.wickwirez.myride.model.FuelLog
 import com.wickwirez.myride.model.ServiceRecord
 import com.wickwirez.myride.model.Vehicle
+import com.wickwirez.myride.model.VehicleDocument
 
 @Database(
-    entities = [Vehicle::class, ServiceRecord::class, FuelLog::class],
-    version = 5,
+    entities = [Vehicle::class, ServiceRecord::class, FuelLog::class, VehicleDocument::class],
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -20,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
     abstract fun serviceRecordDao(): ServiceRecordDao
     abstract fun fuelLogDao(): FuelLogDao
+    abstract fun vehicleDocumentDao(): VehicleDocumentDao
 
     companion object {
         @Volatile
