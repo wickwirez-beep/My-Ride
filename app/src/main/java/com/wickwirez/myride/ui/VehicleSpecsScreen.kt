@@ -168,6 +168,34 @@ private fun VehicleSpecsForm(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+Box(
+    modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(832f / 675f)
+        .clip(RoundedCornerShape(14.dp))
+        .clickable {
+            onSave(
+                vehicle.copy(
+                    oilType = oilType.trim(),
+                    oilCapacity = oilCapacity.trim(),
+                    oilFilterBrand = oilFilterBrand.trim(),
+                    oilFilterPartNumber = oilFilterPartNumber.trim(),
+                    airFilterPartNumber = airFilterPartNumber.trim(),
+                    sparkPlugType = sparkPlugType.trim(),
+                    sparkPlugGap = sparkPlugGap.trim(),
+                    specNotes = specNotes.trim()
+                )
+            )
+            saved = true
+        }
+) {
+    Image(
+        painter = painterResource(id = R.drawable.save_specs_button),
+        contentDescription = "Save Specs",
+        modifier = Modifier.matchParentSize(),
+        contentScale = ContentScale.Fit
+    )
+}
 
                 Spacer(Modifier.height(4.dp))
 
