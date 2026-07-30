@@ -47,13 +47,21 @@ fun SectionCard(
             Image(
                 painter = painterResource(id = backgroundImageRes),
                 contentDescription = null,
-                modifier = Modifier.matchParentSize().alpha(0.28f),
+                modifier = Modifier.matchParentSize().alpha(0.55f),
                 contentScale = ContentScale.Crop
             )
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(Color(0xB3000000))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xE6120E0E),
+                                Color(0x99120E0E),
+                                Color(0x40120E0E)
+                            )
+                        )
+                    )
             )
         }
 
