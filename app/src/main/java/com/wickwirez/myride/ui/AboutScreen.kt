@@ -42,12 +42,11 @@ fun AboutScreen(onBack: () -> Unit) {
         ) {
             Spacer(Modifier.height(24.dp))
             Image(
-                painter = painterResource(id = R.drawable.wrench_photo),
+                painter = painterResource(id = R.drawable.flag_wrenches_badge),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
+                    .size(120.dp)
+                contentScale = ContentScale.Fit
             )
             Spacer(Modifier.height(12.dp))
             Text("My Ride", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
