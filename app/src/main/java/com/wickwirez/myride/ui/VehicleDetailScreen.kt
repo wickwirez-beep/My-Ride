@@ -160,31 +160,7 @@ fun VehicleDetailScreen(
 
             Column(modifier = Modifier.padding(16.dp)) {
 
-                if (vehicle.photoUri != null) {
-                    AsyncImage(
-                        model = vehicle.photoUri,
-                        contentDescription = "Vehicle photo",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-
-                Text(
-                    "${vehicle.year} ${vehicle.make} ${vehicle.model}${if (vehicle.trim.isNotBlank()) " ${vehicle.trim}" else ""}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(4.dp))
-                Text("${vehicle.currentMileage} miles")
-                if (vehicle.vin.isNotBlank()) {
-                    Text("VIN: ${vehicle.vin}")
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(text = "Total spent: ${formatCost(totalCost)}", fontWeight = FontWeight.Bold)
+                VehicleHeroSection(vehicle = vehicle, totalSpent = formatCost(totalCost))
 
                 if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
                     Spacer(Modifier.height(8.dp))
