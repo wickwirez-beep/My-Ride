@@ -206,6 +206,18 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onOpenRecalls = { navController.navigate("recalls/$vehicleId") },
                 onOpenFuelLog = { navController.navigate("fuel_log/$vehicleId") },
                 onOpenSpecs = { navController.navigate("vehicle_specs/$vehicleId") },
+                onOpenDocuments = { navController.navigate("documents/$vehicleId") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "documents/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            DocumentsScreen(
+                vehicleId = vehicleId,
                 onBack = { navController.popBackStack() }
             )
         }

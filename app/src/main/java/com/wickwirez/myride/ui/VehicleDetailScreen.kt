@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
@@ -56,6 +57,7 @@ fun VehicleDetailScreen(
     onOpenRecalls: () -> Unit = {},
     onOpenFuelLog: () -> Unit = {},
     onOpenSpecs: () -> Unit = {},
+    onOpenDocuments: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -103,6 +105,11 @@ fun VehicleDetailScreen(
                                 text = { Text("The Parts Store") },
                                 leadingIcon = { Icon(Icons.Default.Build, contentDescription = null) },
                                 onClick = { menuExpanded = false; onOpenSpecs() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Documents") },
+                                leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenDocuments() }
                             )
                             DropdownMenuItem(
                                 text = { Text("Check for Recalls") },
