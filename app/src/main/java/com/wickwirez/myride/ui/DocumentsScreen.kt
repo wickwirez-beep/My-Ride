@@ -59,6 +59,7 @@ fun DocumentsScreen(
         if (uri != null && category != null) {
             coroutineScope.launch {
                 val mimeType = context.contentResolver.getType(uri)
+                val displayName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor -> val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME); if (idx >= 0 && cursor.moveToFirst()) cursor.getString(idx) else null }
                 val result = DocumentStorage.copyToInternalStorage(context, uri, mimeType)
                 if (result != null) {
                     val (path, name) = result
@@ -66,7 +67,7 @@ fun DocumentsScreen(
                         VehicleDocument(
                             vehicleId = vehicleId,
                             category = category,
-                            fileName = name,
+                            fileName = displayName ?: name,
                             filePath = path,
                             mimeType = mimeType ?: "application/octet-stream"
                         )
