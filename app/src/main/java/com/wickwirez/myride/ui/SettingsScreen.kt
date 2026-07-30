@@ -38,16 +38,21 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
         if (uri != null) {
             working = true
             coroutineScope.launch {
-                val vehicles = repository.getAllVehiclesOnce()
-                val records = repository.getAllRecordsOnce()
-                val fuelLogs = repository.getAllFuelLogsOnce()
-                val json = BackupManager.buildBackupJson(vehicles, records, fuelLogs)
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+                try {
+                    val vehicles = repository.getAllVehiclesOnce()
+                    val records = repository.getAllRecordsOnce()
+                    val fuelLogs = repository.getAllFuelLogsOnce()
+                    val json = BackupManager.buildBackupJson(vehicles, records, fuelLogs)
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+                    }
+                    backupStatus = "Backup saved: ${vehicles.size} vehicle(s), " +
+                        "${records.size} record(s), ${fuelLogs.size} fuel log(s)."
+                } catch (e: Throwable) {
+                    backupStatus = "Backup failed: ${e::class.simpleName}: ${e.message}"
+                } finally {
+                    working = false
                 }
-                working = false
-                backupStatus = "Backup saved: ${vehicles.size} vehicle(s), " +
-                    "${records.size} record(s), ${fuelLogs.size} fuel log(s)."
             }
         }
     }
@@ -58,19 +63,24 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
         if (uri != null) {
             working = true
             coroutineScope.launch {
-                val json = withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                }
-                val data = json?.let { BackupManager.parseBackupJson(it) }
-                working = false
-                if (data != null) {
-                    data.vehicles.forEach { repository.addVehicle(it) }
-                    data.records.forEach { repository.addServiceRecord(it) }
-                    data.fuelLogs.forEach { repository.addFuelLog(it) }
-                    backupStatus = "Restored ${data.vehicles.size} vehicle(s), " +
-                        "${data.records.size} record(s), ${data.fuelLogs.size} fuel log(s)."
-                } else {
-                    backupStatus = "That file couldn't be read as a My Ride backup."
+                try {
+                    val json = withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    }
+                    val data = json?.let { BackupManager.parseBackupJson(it) }
+                    if (data != null) {
+                        data.vehicles.forEach { repository.addVehicle(it) }
+                        data.records.forEach { repository.addServiceRecord(it) }
+                        data.fuelLogs.forEach { repository.addFuelLog(it) }
+                        backupStatus = "Restored ${data.vehicles.size} vehicle(s), " +
+                            "${data.records.size} record(s), ${data.fuelLogs.size} fuel log(s)."
+                    } else {
+                        backupStatus = "That file couldn't be read as a My Ride backup."
+                    }
+                } catch (e: Throwable) {
+                    backupStatus = "Restore failed: ${e::class.simpleName}: ${e.message}"
+                } finally {
+                    working = false
                 }
             }
         }
@@ -149,14 +159,26 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
 
             Row {
                 Button(
-                    onClick = { backupLauncher.launch("myride-backup.json") },
+                    onClick = {
+                        try {
+                            backupLauncher.launch("myride-backup.json")
+                        } catch (e: Throwable) {
+                            backupStatus = "Couldn't open save dialog: ${e::class.simpleName}: ${e.message}"
+                        }
+                    },
                     enabled = !working
                 ) {
                     Text("Back Up")
                 }
                 Spacer(Modifier.width(12.dp))
                 OutlinedButton(
-                    onClick = { restoreLauncher.launch(arrayOf("application/json")) },
+                    onClick = {
+                        try {
+                            restoreLauncher.launch(arrayOf("application/json"))
+                        } catch (e: Throwable) {
+                            backupStatus = "Couldn't open file picker: ${e::class.simpleName}: ${e.message}"
+                        }
+                    },
                     enabled = !working
                 ) {
                     Text("Restore")
@@ -172,7 +194,6 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                 Spacer(Modifier.height(12.dp))
                 Text(backupStatus!!, color = MaterialTheme.colorScheme.primary)
             }
-
             Spacer(Modifier.height(32.dp))
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
