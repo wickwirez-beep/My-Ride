@@ -45,9 +45,10 @@ fun FuelLogEmptyState(
             contentDescription = "Fuel pump illustration",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp)
+                .height(200.dp)
                 .clip(RoundedCornerShape(20.dp)),
             contentScale = ContentScale.Crop
+                ,alignment = Alignment.TopCenter
         )
 
         Spacer(Modifier.height(28.dp))
