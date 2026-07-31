@@ -66,9 +66,9 @@ fun VehicleHeroCard(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                Color.Black.copy(alpha = 0.35f),
+                                Color.Black.copy(alpha = 0.25f),
                                 Color.Transparent,
-                                Color.Black.copy(alpha = 0.85f)
+                                Color.Transparent
                             )
                         )
                     )
@@ -88,40 +88,6 @@ fun VehicleHeroCard(
                     Icon(Icons.Filled.MoreVert, contentDescription = "More", tint = Color.White)
                 }
             }
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = nickname,
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    IconButton(onClick = onEditClick, modifier = Modifier.size(28.dp)) {
-                        Icon(
-                            Icons.Filled.Edit,
-                            contentDescription = "Edit vehicle",
-                            tint = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-                Text(
-                    text = "$year $make $model $trim",
-                    color = Color(0xFFE0E0E0),
-                    fontSize = 15.sp
-                )
-                Text(
-                    text = "$mileage miles",
-                    color = Color(0xFFB3B3B3),
-                    fontSize = 13.sp
-                )
-            }
         }
 
         Column(
@@ -129,11 +95,36 @@ fun VehicleHeroCard(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = nickname,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.width(8.dp))
+                IconButton(onClick = onEditClick, modifier = Modifier.size(28.dp)) {
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = "Edit vehicle",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+            Text(
+                text = "$year $make $model $trim",
+                color = Color(0xFFE0E0E0),
+                fontSize = 15.sp
+            )
+            Text(
+                text = "$mileage miles",
+                color = Color(0xFFB3B3B3),
+                fontSize = 13.sp
+            )
+            Spacer(Modifier.height(10.dp))
             Text("VIN: $vin", color = Color(0xFFB3B3B3), fontSize = 14.sp)
             Spacer(Modifier.height(6.dp))
             Text(
                 text = "Total spent: $totalSpent",
-                color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
