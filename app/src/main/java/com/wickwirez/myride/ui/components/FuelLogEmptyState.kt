@@ -76,16 +76,6 @@ fun FuelLogEmptyState(
 
         Spacer(Modifier.height(28.dp))
 
-        Button(
-            onClick = onLogFillUpClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
-            shape = RoundedCornerShape(14.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-        ) {
-            Text("+  Log Fill-Up", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
 
         Spacer(Modifier.height(16.dp))
     }
