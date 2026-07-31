@@ -24,6 +24,7 @@ import com.wickwirez.myride.model.Vehicle
 
 private fun heroArtworkFor(vehicle: Vehicle): Int? = when {
     vehicle.nickname.equals("Black Knight", ignoreCase = true) -> R.drawable.artwork_truck_hero
+    vehicle.nickname.equals("Sandy", ignoreCase = true) -> R.drawable.artwork_bronco_hero
     else -> null
 }
 
