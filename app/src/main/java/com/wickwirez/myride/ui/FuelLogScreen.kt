@@ -60,21 +60,7 @@ fun FuelLogScreen(
             }
 
             if (uiState.logs.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.fuel_pump_icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp)
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            "No fill-ups logged yet. Tap Log Fill-Up to add the first one.",
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 32.dp)
-                        )
-                    }
-                }
+                com.wickwirez.myride.ui.components.FuelLogEmptyState(onLogFillUpClick = onAddLog)
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
