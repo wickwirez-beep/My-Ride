@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,20 +67,42 @@ fun VehicleHeroSection(vehicle: Vehicle, totalSpent: String) {
 
         if (vehicle.nickname.isNotBlank()) {
             Text(
-                text = vehicle.nickname,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                text = vehicle.nickname.uppercase(),
+                fontSize = 38.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 0.5.sp,
+                color = Color.White,
+                style = androidx.compose.ui.text.TextStyle(
+                    shadow = androidx.compose.ui.graphics.Shadow(
+                        color = Color(0xFFE53935).copy(alpha = 0.85f),
+                        offset = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        blurRadius = 24f
+                    )
+                )
             )
+            Spacer(Modifier.height(4.dp))
+            Box(
+                modifier = Modifier
+                    .width(52.dp)
+                    .height(3.dp)
+                    .background(Color(0xFFE53935), RoundedCornerShape(2.dp))
+            )
+            Spacer(Modifier.height(10.dp))
         }
         Text(
-            text = "${vehicle.year} ${vehicle.make} ${vehicle.model}${if (vehicle.trim.isNotBlank()) " ${vehicle.trim}" else ""}",
+            text = "${vehicle.year} ${vehicle.make} ${vehicle.model}${if (vehicle.trim.isNotBlank()) " ${vehicle.trim}" else ""}".uppercase(),
             color = Color(0xFFE0E0E0),
-            fontSize = 15.sp
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.5.sp
         )
+        Spacer(Modifier.height(6.dp))
         Text(
-            text = "${vehicle.currentMileage} miles",
-            color = Color(0xFFB3B3B3),
-            fontSize = 13.sp
+            text = "${vehicle.currentMileage} MILES",
+            color = Color(0xFFE53935),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
         )
         Spacer(Modifier.height(8.dp))
 
