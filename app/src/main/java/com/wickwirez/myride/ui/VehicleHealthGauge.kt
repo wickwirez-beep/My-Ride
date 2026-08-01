@@ -67,10 +67,17 @@ fun VehicleHealthGauge(
     ) {
         Text(
             text = "VEHICLE HEALTH",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF8A8F98),
-            letterSpacing = 1.5.sp
+            fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White,
+            letterSpacing = 2.sp,
+            style = androidx.compose.ui.text.TextStyle(
+                shadow = androidx.compose.ui.graphics.Shadow(
+                    color = Color(0xFFE53935).copy(alpha = 0.75f),
+                    offset = androidx.compose.ui.geometry.Offset(0f, 0f),
+                    blurRadius = 16f
+                )
+            )
         )
         Spacer(modifier = Modifier.height(6.dp))
         Box(
