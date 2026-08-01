@@ -210,6 +210,10 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onOpenSpecs = { navController.navigate("vehicle_specs/$vehicleId") },
                 onOpenDocuments = { navController.navigate("documents/$vehicleId") },
                 onOpenAiMechanic = { navController.navigate("ai_mechanic/$vehicleId") },
+                onMarkParkedSpot = { lat, lng, timestamp ->
+                    viewModel.markParkedLocation(lat, lng, timestamp)
+                },
+                onClearParkedSpot = { viewModel.clearParkedLocation() },
                 onBack = { navController.popBackStack() }
             )
         }
