@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.wickwirez.myride.R
 import com.wickwirez.myride.data.ApiKeyStore
 import com.wickwirez.myride.data.GeminiApiClient
 import com.wickwirez.myride.model.ServiceRecord
@@ -136,6 +138,16 @@ fun AiMechanicScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.artwork_ai_mechanic_hero),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
