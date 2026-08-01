@@ -61,6 +61,8 @@ fun VehicleDetailScreen(
     onOpenSpecs: () -> Unit = {},
     onOpenDocuments: () -> Unit = {},
     onOpenAiMechanic: () -> Unit = {},
+    onMarkParkedSpot: (Double, Double, Long) -> Unit = { _, _, _ -> },
+    onClearParkedSpot: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -184,6 +186,15 @@ fun VehicleDetailScreen(
                         vehicle = vehicle,
                         totalSpent = formatCost(totalCost),
                         parallaxOffsetPx = heroOffsetPx
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+                    ParkingCard(
+                        parkedLat = vehicle.parkedLat,
+                        parkedLng = vehicle.parkedLng,
+                        parkedAt = vehicle.parkedAt,
+                        onSpotMarked = onMarkParkedSpot,
+                        onSpotCleared = onClearParkedSpot
                     )
 
                     val healthScore = remember(vehicle, records) {

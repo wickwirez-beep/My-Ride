@@ -56,6 +56,24 @@ class VehicleDetailViewModel(
         }
     }
 
+    fun markParkedLocation(lat: Double, lng: Double, timestamp: Long) {
+        viewModelScope.launch {
+            val vehicle = uiState.value.vehicle ?: return@launch
+            repository.updateVehicle(
+                vehicle.copy(parkedLat = lat, parkedLng = lng, parkedAt = timestamp)
+            )
+        }
+    }
+
+    fun clearParkedLocation() {
+        viewModelScope.launch {
+            val vehicle = uiState.value.vehicle ?: return@launch
+            repository.updateVehicle(
+                vehicle.copy(parkedLat = null, parkedLng = null, parkedAt = null)
+            )
+        }
+    }
+
     companion object {
         fun factory(repository: VehicleRepository, vehicleId: Long) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")

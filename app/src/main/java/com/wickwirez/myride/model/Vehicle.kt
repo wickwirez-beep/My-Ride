@@ -22,5 +22,8 @@ data class Vehicle(
     val airFilterPartNumber: String = "",
     val sparkPlugType: String = "",
     val sparkPlugGap: String = "",
-    val specNotes: String = ""
+    val specNotes: String = "",
+    val parkedLat: Double? = null,
+    val parkedLng: Double? = null,
+    val parkedAt: Long? = null
 )
