@@ -47,8 +47,9 @@ fun VehicleHealthGauge(
     diameter: Dp = 160.dp
 ) {
     val animatedProgress = remember { Animatable(0f) }
-    val targetFraction = score.coerceIn(0, 100) / 100f
-    val color = colorForStatus(status)
+    val hasData = status != DueStatus.NONE
+    val targetFraction = if (hasData) score.coerceIn(0, 100) / 100f else 0f
+    val color = if (hasData) colorForStatus(status) else Color(0xFF4A4F58)
 
     LaunchedEffect(score) {
         animatedProgress.snapTo(0f)
@@ -90,7 +91,7 @@ fun VehicleHealthGauge(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "$score",
+                text = if (hasData) "$score" else "—",
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 color = color
