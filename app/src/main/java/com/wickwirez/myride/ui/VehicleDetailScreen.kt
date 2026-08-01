@@ -58,6 +58,7 @@ fun VehicleDetailScreen(
     onOpenFuelLog: () -> Unit = {},
     onOpenSpecs: () -> Unit = {},
     onOpenDocuments: () -> Unit = {},
+    onOpenAiMechanic: () -> Unit = {},
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -110,6 +111,11 @@ fun VehicleDetailScreen(
                                 text = { Text("Documents") },
                                 leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) },
                                 onClick = { menuExpanded = false; onOpenDocuments() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("AI Mechanic") },
+                                leadingIcon = { Icon(Icons.Default.Build, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenAiMechanic() }
                             )
                             DropdownMenuItem(
                                 text = { Text("Check for Recalls") },

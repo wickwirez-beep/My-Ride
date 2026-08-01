@@ -37,6 +37,7 @@ import com.wickwirez.myride.ui.AddFuelLogViewModel
 import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
 import com.wickwirez.myride.ui.AiAssistantScreen
+import com.wickwirez.myride.ui.AiMechanicScreen
 import com.wickwirez.myride.ui.EditServiceRecordScreen
 import com.wickwirez.myride.ui.EditServiceRecordViewModel
 import com.wickwirez.myride.ui.EditFuelLogScreen
@@ -208,6 +209,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onOpenFuelLog = { navController.navigate("fuel_log/$vehicleId") },
                 onOpenSpecs = { navController.navigate("vehicle_specs/$vehicleId") },
                 onOpenDocuments = { navController.navigate("documents/$vehicleId") },
+                onOpenAiMechanic = { navController.navigate("ai_mechanic/$vehicleId") },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -334,6 +336,23 @@ private fun MyRideNavHost(repository: VehicleRepository) {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             AiAssistantScreen(
+                vehicle = uiState.vehicle,
+                records = uiState.records,
+                onOpenSettings = { navController.navigate("settings") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "ai_mechanic/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: VehicleDetailViewModel =
+                viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            AiMechanicScreen(
                 vehicle = uiState.vehicle,
                 records = uiState.records,
                 onOpenSettings = { navController.navigate("settings") },
