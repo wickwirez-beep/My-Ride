@@ -5,6 +5,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,10 +61,22 @@ fun VehicleHealthGauge(
         )
     }
 
-    Box(
-        modifier = modifier.size(diameter),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = "VEHICLE HEALTH",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF8A8F98),
+            letterSpacing = 1.5.sp
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Box(
+            modifier = Modifier.size(diameter),
+            contentAlignment = Alignment.Center
+        ) {
         Canvas(modifier = Modifier.size(diameter)) {
             val strokeWidth = diameter.toPx() * 0.09f
             val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
@@ -101,6 +115,7 @@ fun VehicleHealthGauge(
                 fontSize = 12.sp,
                 color = Color(0xFFB3B3B3)
             )
+        }
         }
     }
 }
