@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -108,7 +110,7 @@ fun VehicleDetailScreen(
                                 onClick = { menuExpanded = false; onOpenSpecs() }
                             )
                             DropdownMenuItem(
-                                text = { Text("Documents") },
+                                text = { Text("Digital Glove Box") },
                                 leadingIcon = { Icon(Icons.Default.Description, contentDescription = null) },
                                 onClick = { menuExpanded = false; onOpenDocuments() }
                             )
@@ -162,43 +164,61 @@ fun VehicleDetailScreen(
             return@Scaffold
         }
 
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        val listState = rememberLazyListState()
+        val heroOffsetPx by remember {
+            derivedStateOf {
+                listState.layoutInfo.visibleItemsInfo
+                    .firstOrNull { it.index == 0 }
+                    ?.offset
+                    ?.toFloat() ?: 0f
+            }
+        }
 
-            Column(modifier = Modifier.padding(16.dp)) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize().padding(padding)
+        ) {
+            item {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    VehicleHeroSection(
+                        vehicle = vehicle,
+                        totalSpent = formatCost(totalCost),
+                        parallaxOffsetPx = heroOffsetPx
+                    )
 
-                VehicleHeroSection(vehicle = vehicle, totalSpent = formatCost(totalCost))
-
-                val healthScore = remember(vehicle, records) {
-                    computeHealthScore(vehicle, records, System.currentTimeMillis())
-                }
-                Spacer(Modifier.height(16.dp))
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    VehicleHealthGauge(score = healthScore, status = dueStatus)
-                }
-
-                if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
-                    Spacer(Modifier.height(8.dp))
-                    DueStatusBeacon(dueStatus)
-                }
-
-                if (records.isNotEmpty()) {
+                    val healthScore = remember(vehicle, records) {
+                        computeHealthScore(vehicle, records, System.currentTimeMillis())
+                    }
                     Spacer(Modifier.height(16.dp))
-                    SpendingChart(records)
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        VehicleHealthGauge(score = healthScore, status = dueStatus)
+                    }
+
+                    if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
+                        Spacer(Modifier.height(8.dp))
+                        DueStatusBeacon(dueStatus)
+                    }
+
+                    if (records.isNotEmpty()) {
+                        Spacer(Modifier.height(16.dp))
+                        SpendingChart(records)
+                    }
                 }
+                HorizontalDivider()
             }
 
-            HorizontalDivider()
-
             if (records.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No service history yet. Tap Log Service to add the first entry.")
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No service history yet. Tap Log Service to add the first entry.")
+                    }
                 }
             } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(items = records, key = { it.id }) { record ->
+                items(items = records, key = { it.id }) { record ->
+                    Box(modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)) {
                         ServiceRecordRow(
                             record,
                             onClick = { onRecordClick(record) },

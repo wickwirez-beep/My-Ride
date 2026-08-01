@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +31,11 @@ private fun heroArtworkFor(vehicle: Vehicle): Int? = when {
 }
 
 @Composable
-fun VehicleHeroSection(vehicle: Vehicle, totalSpent: String) {
+fun VehicleHeroSection(
+    vehicle: Vehicle,
+    totalSpent: String,
+    parallaxOffsetPx: Float = 0f
+) {
     val heroRes = heroArtworkFor(vehicle)
     val imageModel: Any? = heroRes ?: vehicle.photoUri
 
@@ -45,7 +50,13 @@ fun VehicleHeroSection(vehicle: Vehicle, totalSpent: String) {
                 AsyncImage(
                     model = imageModel,
                     contentDescription = "${vehicle.nickname} photo",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            translationY = -parallaxOffsetPx * 0.4f
+                            scaleX = 1.15f
+                            scaleY = 1.15f
+                        },
                     contentScale = ContentScale.Crop
                 )
 
