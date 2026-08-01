@@ -168,6 +168,14 @@ fun VehicleDetailScreen(
 
                 VehicleHeroSection(vehicle = vehicle, totalSpent = formatCost(totalCost))
 
+                val healthScore = remember(vehicle, records) {
+                    computeHealthScore(vehicle, records, System.currentTimeMillis())
+                }
+                Spacer(Modifier.height(16.dp))
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    VehicleHealthGauge(score = healthScore, status = dueStatus)
+                }
+
                 if (dueStatus == DueStatus.OVERDUE || dueStatus == DueStatus.DUE_SOON) {
                     Spacer(Modifier.height(8.dp))
                     DueStatusBeacon(dueStatus)

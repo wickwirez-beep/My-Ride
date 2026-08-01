@@ -67,3 +67,29 @@ fun computeWorstDueStatus(vehicle: Vehicle, records: List<ServiceRecord>, nowMs:
         else -> DueStatus.NONE
     }
 }
+
+// Continuous 0-100 version of the same interval math used above: 100 = nothing
+// due, drops toward 0 as the nearest mileage/date reminder approaches or passes.
+fun computeHealthScore(vehicle: Vehicle, records: List<ServiceRecord>, nowMs: Long): Int {
+    var worstFraction = 1.0
+
+    records.forEach { record ->
+        record.reminderIntervalMiles?.let { interval ->
+            if (interval > 0) {
+                val remaining = (record.mileage + interval) - vehicle.currentMileage
+                val fraction = (remaining.toDouble() / interval).coerceIn(0.0, 1.0)
+                worstFraction = minOf(worstFraction, fraction)
+            }
+        }
+        record.reminderIntervalDays?.let { interval ->
+            if (interval > 0) {
+                val dueAtMs = record.date + interval * MS_PER_DAY
+                val remainingDays = (dueAtMs - nowMs) / MS_PER_DAY
+                val fraction = (remainingDays.toDouble() / interval).coerceIn(0.0, 1.0)
+                worstFraction = minOf(worstFraction, fraction)
+            }
+        }
+    }
+
+    return (worstFraction * 100).toInt().coerceIn(0, 100)
+}
