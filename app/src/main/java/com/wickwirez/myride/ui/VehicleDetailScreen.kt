@@ -148,11 +148,9 @@ fun VehicleDetailScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddService,
-                icon = { Icon(Icons.Default.Add, null) },
-                text = { Text("Log Service") }
-            )
+            FloatingActionButton(onClick = onAddService) {
+                Icon(Icons.Default.Add, contentDescription = "Log Service")
+            }
         }
     ) { padding ->
 

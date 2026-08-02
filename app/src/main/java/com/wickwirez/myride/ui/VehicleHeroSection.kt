@@ -120,7 +120,5 @@ fun VehicleHeroSection(
         if (vehicle.vin.isNotBlank()) {
             Text("VIN: ${vehicle.vin}")
         }
-        Spacer(Modifier.height(8.dp))
-        Text(text = "Total spent: $totalSpent", fontWeight = FontWeight.Bold)
     }
 }
