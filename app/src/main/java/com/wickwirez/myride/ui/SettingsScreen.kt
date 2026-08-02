@@ -42,7 +42,7 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                     val vehicles = repository.getAllVehiclesOnce()
                     val records = repository.getAllRecordsOnce()
                     val fuelLogs = repository.getAllFuelLogsOnce()
-                    val json = BackupManager.buildBackupJson(vehicles, records, fuelLogs)
+                    val json = BackupManager.buildBackupJson(vehicles, records, fuelLogs, ApiKeyStore.getApiKey(context))
                     withContext(Dispatchers.IO) {
                         context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
                     }
@@ -67,11 +67,12 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                     val json = withContext(Dispatchers.IO) {
                         context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                     }
-                    val data = json?.let { BackupManager.parseBackupJson(it) }
+                    val data = json?.let { BackupManager.parseBackupJson(context, it) }
                     if (data != null) {
                         data.vehicles.forEach { repository.addVehicle(it) }
                         data.records.forEach { repository.addServiceRecord(it) }
                         data.fuelLogs.forEach { repository.addFuelLog(it) }
+                        data.apiKey?.let { key -> ApiKeyStore.setApiKey(context, key) }
                         backupStatus = "Restored ${data.vehicles.size} vehicle(s), " +
                             "${data.records.size} record(s), ${data.fuelLogs.size} fuel log(s)."
                     } else {

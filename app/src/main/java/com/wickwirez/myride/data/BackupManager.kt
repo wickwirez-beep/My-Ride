@@ -6,19 +6,51 @@ import com.wickwirez.myride.model.ServiceType
 import com.wickwirez.myride.model.Vehicle
 import org.json.JSONArray
 import org.json.JSONObject
+import android.net.Uri
+import android.util.Base64
+import java.io.File
+import android.content.Context
 
 object BackupManager {
+
+    private fun encodePhotoBase64(photoUri: String?): String? {
+        if (photoUri == null) return null
+        return try {
+            val path = Uri.parse(photoUri).path ?: return null
+            val file = File(path)
+            if (!file.exists()) return null
+            Base64.encodeToString(file.readBytes(), Base64.NO_WRAP)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun decodePhotoAndSave(context: Context, base64: String?): String? {
+        if (base64.isNullOrBlank()) return null
+        return try {
+            val bytes = Base64.decode(base64, Base64.NO_WRAP)
+            val photosDir = File(context.filesDir, "photos").apply { mkdirs() }
+            val destFile = File(photosDir, "${java.util.UUID.randomUUID()}.jpg")
+            destFile.writeBytes(bytes)
+            Uri.fromFile(destFile).toString()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 
     data class BackupData(
         val vehicles: List<Vehicle>,
         val records: List<ServiceRecord>,
-        val fuelLogs: List<FuelLog>
+        val fuelLogs: List<FuelLog>,
+        val apiKey: String?
     )
 
     fun buildBackupJson(
         vehicles: List<Vehicle>,
         records: List<ServiceRecord>,
-        fuelLogs: List<FuelLog>
+        fuelLogs: List<FuelLog>,
+        apiKey: String?
     ): String {
         val vehiclesJson = JSONArray()
         vehicles.forEach { v ->
@@ -33,6 +65,7 @@ object BackupManager {
                     put("vin", v.vin)
                     put("currentMileage", v.currentMileage)
                     put("photoUri", v.photoUri ?: JSONObject.NULL)
+                    put("photoBase64", encodePhotoBase64(v.photoUri) ?: JSONObject.NULL)
                     put("oilType", v.oilType)
                     put("oilCapacity", v.oilCapacity)
                     put("oilFilterBrand", v.oilFilterBrand)
@@ -79,16 +112,17 @@ object BackupManager {
         }
 
         val root = JSONObject().apply {
-            put("version", 2)
+            put("version", 3)
             put("vehicles", vehiclesJson)
             put("serviceRecords", recordsJson)
             put("fuelLogs", fuelLogsJson)
+            put("apiKey", apiKey ?: JSONObject.NULL)
         }
 
         return root.toString(2)
     }
 
-    fun parseBackupJson(json: String): BackupData? {
+    fun parseBackupJson(context: Context, json: String): BackupData? {
         return try {
             val root = JSONObject(json)
             val vehiclesJson = root.getJSONArray("vehicles")
@@ -106,7 +140,7 @@ object BackupManager {
                     trim = o.optString("trim", ""),
                     vin = o.optString("vin", ""),
                     currentMileage = o.optInt("currentMileage", 0),
-                    photoUri = if (o.isNull("photoUri")) null else o.getString("photoUri"),
+                    photoUri = decodePhotoAndSave(context, if (o.has("photoBase64") && !o.isNull("photoBase64")) o.getString("photoBase64") else null) ?: (if (o.isNull("photoUri")) null else o.getString("photoUri")),
                     oilType = o.optString("oilType", ""),
                     oilCapacity = o.optString("oilCapacity", ""),
                     oilFilterBrand = o.optString("oilFilterBrand", ""),
@@ -155,7 +189,8 @@ object BackupManager {
                 )
             }
 
-            BackupData(vehicles, records, fuelLogs)
+            val apiKey = if (root.has("apiKey") && !root.isNull("apiKey")) root.getString("apiKey") else null
+            BackupData(vehicles, records, fuelLogs, apiKey)
         } catch (e: Exception) {
             null
         }
