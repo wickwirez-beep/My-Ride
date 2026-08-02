@@ -147,11 +147,7 @@ fun VehicleDetailScreen(
                 }
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddService) {
-                Icon(Icons.Default.Add, contentDescription = "Log Service")
-            }
-        }
+        
     ) { padding ->
 
         if (vehicle == null) {
@@ -192,7 +188,8 @@ fun VehicleDetailScreen(
                         parkedLng = vehicle.parkedLng,
                         parkedAt = vehicle.parkedAt,
                         onSpotMarked = onMarkParkedSpot,
-                        onSpotCleared = onClearParkedSpot
+                        onSpotCleared = onClearParkedSpot,
+                        onAddService = onAddService
                     )
 
                     val healthScore = remember(vehicle, records) {
