@@ -84,7 +84,7 @@ fun GarageScreen(
                         Image(
                             painter = painterResource(id = R.drawable.nav_settings),
                             contentDescription = "Settings",
-                            modifier = Modifier.size(38.dp)
+                            modifier = Modifier.size(46.dp)
                         )
                     }
                 },
