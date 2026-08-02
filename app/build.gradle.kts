@@ -5,7 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val autoVersionCode = ((System.currentTimeMillis() - 1704067200000L) / 60000L).toInt()
+val ciVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 1
 android {
     namespace = "com.wickwirez.myride"
     compileSdk = 36
@@ -23,7 +23,7 @@ android {
         applicationId = "com.wickwirez.myride"
         minSdk = 26
         targetSdk = 36
-        versionCode = autoVersionCode
+        versionCode = ciVersionCode
         versionName = "1.0"
     }
 
