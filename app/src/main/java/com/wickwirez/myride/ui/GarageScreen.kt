@@ -72,10 +72,11 @@ fun GarageScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "My Ride",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 24.sp
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_wordmark),
+                        contentDescription = "My Ride",
+                        modifier = Modifier.height(40.dp),
+                        contentScale = ContentScale.Fit
                     )
                 },
                 actions = {
@@ -83,7 +84,7 @@ fun GarageScreen(
                         Image(
                             painter = painterResource(id = R.drawable.nav_settings),
                             contentDescription = "Settings",
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(38.dp)
                         )
                     }
                 },
