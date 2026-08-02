@@ -182,14 +182,25 @@ fun VehicleDetailScreen(
                         parallaxOffsetPx = heroOffsetPx
                     )
 
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                        Button(
+                            onClick = onAddService,
+                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Log", fontSize = 12.sp, fontWeight = FontWeight.Bold, lineHeight = 13.sp)
+                                Text("Service", fontSize = 12.sp, fontWeight = FontWeight.Bold, lineHeight = 13.sp)
+                            }
+                        }
+                    }
+
                     Spacer(Modifier.height(16.dp))
                     ParkingCard(
                         parkedLat = vehicle.parkedLat,
                         parkedLng = vehicle.parkedLng,
                         parkedAt = vehicle.parkedAt,
                         onSpotMarked = onMarkParkedSpot,
-                        onSpotCleared = onClearParkedSpot,
-                        onAddService = onAddService
+                        onSpotCleared = onClearParkedSpot
                     )
 
                     val healthScore = remember(vehicle, records) {

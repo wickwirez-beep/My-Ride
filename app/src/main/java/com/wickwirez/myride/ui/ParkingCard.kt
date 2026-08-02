@@ -50,8 +50,7 @@ fun ParkingCard(
     parkedLng: Double?,
     parkedAt: Long?,
     onSpotMarked: (Double, Double, Long) -> Unit,
-    onSpotCleared: () -> Unit,
-    onAddService: () -> Unit
+    onSpotCleared: () -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -151,16 +150,6 @@ fun ParkingCard(
                             Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text("Clear", fontSize = 13.sp, maxLines = 1)
-                        }
-                        Button(
-                            onClick = onAddService,
-                            modifier = Modifier.weight(1f),
-                            contentPadding = tightPadding
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Log", fontSize = 11.sp, fontWeight = FontWeight.Bold, lineHeight = 12.sp)
-                                Text("Service", fontSize = 11.sp, fontWeight = FontWeight.Bold, lineHeight = 12.sp)
-                            }
                         }
                     }
                 }
