@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val autoVersionCode = ((System.currentTimeMillis() - 1704067200000L) / 60000L).toInt()
 android {
     namespace = "com.wickwirez.myride"
     compileSdk = 36
@@ -22,7 +23,7 @@ android {
         applicationId = "com.wickwirez.myride"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        versionCode = autoVersionCode
         versionName = "1.0"
     }
 

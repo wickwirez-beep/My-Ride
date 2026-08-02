@@ -51,7 +51,7 @@ fun AboutScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(12.dp))
             Text("My Ride", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyMedium)
+            Text("Version ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})", style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(24.dp))
             Text(
                 "Complete vehicle maintenance and expense tracker.",
