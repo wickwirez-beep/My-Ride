@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Ride — Privacy Policy</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  h1 {
+    font-size: 1.8em;
+    margin-bottom: 4px;
+  }
+  .updated {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 1.25em;
+    margin-top: 2em;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 6px;
+  }
+  ul {
+    padding-left: 22px;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+  a {
+    color: #0066cc;
+  }
+  .summary-box {
+    background: #f6f8fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .summary-box p:first-child {
+    margin-top: 0;
+  }
+  .summary-box p:last-child {
+    margin-bottom: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy for My Ride</h1>
+<p class="updated">Last updated: August 2, 2026</p>
+
+<div class="summary-box">
+  <p><strong>Plain-language summary:</strong> My Ride stores your vehicle information on your own device. There is no account, no ad tracking, and no server run by the developer that your data passes through. The only time information leaves your device is when you choose to use an AI feature (which sends data directly to Google's Gemini API using your own API key) or when you export a backup file yourself.</p>
+</div>
+
+<h2>What information the app collects</h2>
+<p>My Ride stores the following information, entered by you, on your device only:</p>
+<ul>
+  <li>Vehicle details: nickname, year, make, model, trim, VIN, and mileage</li>
+  <li>Service history, fuel logs, and reminders you create</li>
+  <li>Photos you attach to a vehicle, a service record, or a document</li>
+  <li>Documents you upload (insurance cards, registration, etc.)</li>
+  <li>Your saved "parked location" (GPS coordinates), if you use the Satellite Parking feature</li>
+  <li>Your own Gemini API key, if you choose to add one for the AI features</li>
+</ul>
+<p>All of this is stored locally in the app's private storage on your device, using Android's standard app database and file storage. It is not uploaded to any server operated by the developer, because no such server exists.</p>
+
+<h2>Camera and photos</h2>
+<p>My Ride uses your device's camera to let you photograph your vehicle, scan a VIN barcode, and attach photos to service records or the AI Mechanic feature. Photos are saved to the app's private storage on your device. They are only transmitted off your device if you use an AI feature (see below) or include them in a backup file you create yourself.</p>
+
+<h2>Location</h2>
+<p>My Ride uses your device's location, only when you tap "Mark My Spot" in the Satellite Parking feature, to save the coordinates of where you parked. This location is stored on your device and used to open Google Maps (satellite view, street view, or walking directions) when you tap those buttons. Location is not collected in the background and is not sent anywhere except to open Google Maps, which is handled by the Google Maps app itself, outside of My Ride.</p>
+
+<h2>AI features (Gemini API)</h2>
+<p>My Ride's AI Mechanic and AI Assistant features are powered by Google's Gemini API. To use these features, you provide your own free Gemini API key in Settings. When you use an AI feature:</p>
+<ul>
+  <li>The photo, text, or question you submit is sent directly from your device to Google's Gemini API, authenticated with your own API key</li>
+  <li>The developer of My Ride does not see, receive, or store this data at any point — the request goes directly from your device to Google</li>
+  <li>Google's handling of this data is governed by <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's Gemini API terms and privacy policies</a>, not by this policy</li>
+</ul>
+<p>If you do not add an API key, these features are simply unavailable, and no data is sent anywhere for them.</p>
+
+<h2>VIN decoding</h2>
+<p>When you decode a VIN, My Ride sends the 17-character VIN to the National Highway Traffic Safety Administration's (NHTSA) free public VIN decoding service to look up the vehicle's year, make, model, and trim. No other information is sent with this request.</p>
+
+<h2>Backup and restore</h2>
+<p>My Ride lets you export a backup file (containing your vehicles, service history, fuel logs, photos, and API key) to a location you choose, using Android's standard file save dialog — for example, your device's Downloads folder or a cloud storage app like Google Drive. This file is created and saved entirely by you; the developer never receives a copy of it. You are responsible for keeping this file secure, since it contains your data (including your API key) in an unencrypted, readable format.</p>
+
+<h2>What the app does not do</h2>
+<ul>
+  <li>No user accounts or sign-in are required or collected</li>
+  <li>No advertising and no ad tracking</li>
+  <li>No analytics or usage tracking</li>
+  <li>No data is sold, rented, or shared with third parties for marketing purposes</li>
+  <li>No developer-operated server stores or processes your data</li>
+</ul>
+
+<h2>Data deletion</h2>
+<p>Since all of your data is stored locally, uninstalling My Ride deletes it from your device. If you've saved a backup file elsewhere (like Google Drive), that copy remains until you delete it yourself.</p>
+
+<h2>Children's privacy</h2>
+<p>My Ride is not directed at children and is not intended for use by anyone under 13.</p>
+
+<h2>Changes to this policy</h2>
+<p>If this policy changes, the updated version will be posted at this same page with a new "Last updated" date.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy can be sent via <a href="https://github.com/wickwirez-beep/My-Ride" target="_blank" rel="noopener">the My Ride GitHub repository</a>.</p>
+
+</body>
+</html>
