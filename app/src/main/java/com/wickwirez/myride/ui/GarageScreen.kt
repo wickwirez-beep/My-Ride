@@ -193,7 +193,15 @@ private fun VehicleCard(
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (vehicle.photoUri != null) {
+                        val heroRes = heroArtworkFor(vehicle)
+                        if (heroRes != null) {
+                            Image(
+                                painter = painterResource(id = heroRes),
+                                contentDescription = "Vehicle photo",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else if (vehicle.photoUri != null) {
                             AsyncImage(
                                 model = vehicle.photoUri,
                                 contentDescription = "Vehicle photo",

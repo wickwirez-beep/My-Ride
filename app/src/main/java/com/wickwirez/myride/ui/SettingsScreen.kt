@@ -72,7 +72,7 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                         data.vehicles.forEach { repository.addVehicle(it) }
                         data.records.forEach { repository.addServiceRecord(it) }
                         data.fuelLogs.forEach { repository.addFuelLog(it) }
-                        data.apiKey?.let { key -> ApiKeyStore.setApiKey(context, key) }
+                        data.apiKey?.let { key -> ApiKeyStore.setApiKey(context, key); apiKey = key }
                         backupStatus = "Restored ${data.vehicles.size} vehicle(s), " +
                             "${data.records.size} record(s), ${data.fuelLogs.size} fuel log(s)."
                     } else {
