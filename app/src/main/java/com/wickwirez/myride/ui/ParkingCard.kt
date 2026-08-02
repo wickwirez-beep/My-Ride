@@ -92,7 +92,7 @@ fun ParkingCard(
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFFE53935))
+                Text("📡", fontSize = 20.sp)
                 Spacer(Modifier.width(8.dp))
                 Text("SATELLITE PARKING", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             }
