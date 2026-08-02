@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -115,26 +116,42 @@ fun ParkingCard(
                     color = Color(0xFFB3B3B3)
                 )
                 Spacer(Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { openMapsUrl(context, "https://www.google.com/maps/@$parkedLat,$parkedLng,19z/data=!3m1!1e3") },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Satellite", fontSize = 12.sp) }
-                    OutlinedButton(
-                        onClick = { openMapsUrl(context, "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=$parkedLat,$parkedLng") },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Street", fontSize = 12.sp) }
-                    OutlinedButton(
-                        onClick = { openMapsUrl(context, "https://www.google.com/maps/dir/?api=1&destination=$parkedLat,$parkedLng&travelmode=walking") },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Walk", fontSize = 12.sp) }
-                    OutlinedButton(
-                        onClick = onSpotCleared,
-                        modifier = Modifier.weight(1f)
-                    ) { Icon(Icons.Default.Close, contentDescription = "Clear parked spot", modifier = Modifier.size(16.dp)) }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val tightPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { openMapsUrl(context, "https://www.google.com/maps/@$parkedLat,$parkedLng,19z/data=!3m1!1e3") },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = tightPadding
+                        ) { Text("Satellite", fontSize = 13.sp, maxLines = 1) }
+                        OutlinedButton(
+                            onClick = { openMapsUrl(context, "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=$parkedLat,$parkedLng") },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = tightPadding
+                        ) { Text("Street", fontSize = 13.sp, maxLines = 1) }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { openMapsUrl(context, "https://www.google.com/maps/dir/?api=1&destination=$parkedLat,$parkedLng&travelmode=walking") },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = tightPadding
+                        ) { Text("Walk", fontSize = 13.sp, maxLines = 1) }
+                        OutlinedButton(
+                            onClick = onSpotCleared,
+                            modifier = Modifier.weight(1f),
+                            contentPadding = tightPadding
+                        ) {
+                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Clear", fontSize = 13.sp, maxLines = 1)
+                        }
+                    }
                 }
             }
         }
