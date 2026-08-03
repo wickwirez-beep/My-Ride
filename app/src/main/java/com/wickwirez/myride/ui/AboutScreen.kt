@@ -66,7 +66,8 @@ fun AboutScreen(onBack: () -> Unit) {
             Text(
                 "Vehicle photos, VIN decode and scanning, maintenance reminders, " +
                     "service history, spending charts, backup & restore, printing, " +
-                    "and an AI assistant powered by Google Gemini.",
+                    "Digital Glove Box document storage, AI Mechanic diagnostics, " +
+                    "Satellite Parking, and an AI assistant powered by Google Gemini.",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
