@@ -70,7 +70,7 @@ fun SplashScreen(onFinished: () -> Unit) {
 
         val soundDurationMs = if (mediaPlayer != null) {
             mediaPlayer.start()
-            mediaPlayer.duration.toLong().coerceAtLeast(0L)
+            mediaPlayer.duration.toLong().coerceIn(0L, 3000L)
         } else {
             3000L
         }
