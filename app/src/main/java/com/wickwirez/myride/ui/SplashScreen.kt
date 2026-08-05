@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -40,14 +42,15 @@ private const val HUB_Y = 285f
 private const val NEEDLE_SPRITE_SIZE = 420f
 
 // rotationZ = 0 shows the needle exactly as drawn in splash_needle.png,
-// which is the "hero pose" resting a little past 7 (~7500 RPM).
-// These target rotations were calibrated against the dial's own
-// printed numbers, so 0f always lines up with that resting pose.
-private const val ROT_IDLE = 193f       // ~0.75 (750 RPM)
-private const val ROT_REV1_PEAK = 14f   // ~7.0
-private const val ROT_DIP1 = 157f       // ~2.0
-private const val ROT_REV2_PEAK = -9f   // ~7.8 (brief redline flourish)
-private const val ROT_DIP2 = 129f       // ~3.0
+// which is the "hero pose" resting a little past 7.
+// Calibrated directly against the "1" and "7" tick marks on the dial
+// (not extrapolated), and kept strictly between them so the needle
+// never approaches the unmarked zone near 0/8 at the bottom.
+private const val ROT_IDLE = 189f       // sits right at "1"
+private const val ROT_REV1_PEAK = 11f   // sits right at "7"
+private const val ROT_DIP1 = 144f       // ~2.5
+private const val ROT_REV2_PEAK = 17f   // ~6.8, just shy of "7"
+private const val ROT_DIP2 = 115f       // ~3.5
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
@@ -123,18 +126,24 @@ fun SplashScreen(onFinished: () -> Unit) {
                 contentScale = ContentScale.Fit
             )
 
-            Image(
-                painter = painterResource(id = R.drawable.splash_needle),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .offset(x = needleLeft, y = needleTop)
                     .size(needleSizeDp)
-                    .graphicsLayer {
-                        rotationZ = needleRotation.value
-                    },
-                contentScale = ContentScale.Fit
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.splash_needle),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            rotationZ = needleRotation.value
+                            transformOrigin = TransformOrigin(0.5f, 0.5f)
+                        },
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
     }
 }
