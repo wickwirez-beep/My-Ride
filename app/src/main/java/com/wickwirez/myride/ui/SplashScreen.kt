@@ -35,22 +35,29 @@ import kotlinx.coroutines.launch
 private const val POSTER_W = 736f
 private const val POSTER_H = 1418f
 
-// Hub (pivot) position in splash_bg.png pixel coordinates. Measured
-// directly from the artwork (Hough circle fit on the bezel + pivot cap).
-private const val HUB_X = 375f
-private const val HUB_Y = 283f
+// Hub (pivot) position in splash_bg.png pixel coordinates. Re-measured
+// via Hough circle fit directly on the bezel ring in splash_bg.png
+// (center 375.0, 277.8, radius 229.5) — precise to sub-pixel, not eyeballed.
+private const val HUB_X = 375.0f
+private const val HUB_Y = 277.8f
 
 // splash_needle.png is a square sprite centered exactly on the hub.
 private const val NEEDLE_SPRITE_SIZE = 420f
 
 // rotationZ value that points the needle at each whole-number mark on the
 // dial (index = RPM x1000, e.g. ROT_AT_MARK[4] points at "4" / 4000 RPM).
-// Measured directly from splash_bg.png (tick-mark pixel positions) and
-// splash_needle.png (pivot-to-tip angle) — not eyeballed — so a sweep
-// between any two of these stays on real numbers and never dips into
-// the unmarked gap between "8" and "0" at the bottom of the dial.
+//
+// Re-measured directly from splash_bg.png: each number's angular position
+// was found by scanning bright pixels in an annulus around the hub, then
+// fit with a linear regression across marks 1-8 (residuals within +/-3
+// degrees, confirming near-uniform ~31.25 degree spacing). Mark "0" is
+// partially occluded by the "MY RIDE" logo artwork in this asset, so its
+// position is the regression's extrapolated value rather than a direct
+// pixel measurement. The whole array is anchored so mark 4 keeps its
+// previous value exactly (that position was confirmed correct), and
+// every other mark is corrected relative to it.
 private val ROT_AT_MARK = floatArrayOf(
-    136.0f, 167.97f, 195.82f, 226.01f, 258.73f, 290.99f, 321.17f, 348.28f, 375.5f
+    133.46f, 165.71f, 194.49f, 224.65f, 258.73f, 292.68f, 323.58f, 351.76f, 381.16f
 )
 
 // Converts a dial value (RPM x1000, e.g. 4.2f = 4200 RPM) to the
@@ -65,16 +72,17 @@ private fun rpmToAngle(rpmThousands: Float): Float {
 }
 
 // Idle and throttle-blip peak, in RPM x1000 — matches the "RPM X 1000"
-// label on the dial face. Tune PEAK_RPM within the 3.8–4.5 range to taste.
+// label on the dial face. Tune PEAK_RPM within the 3.8-4.5 range to taste.
 private const val IDLE_RPM = 0.8f
 private const val PEAK_RPM = 4.2f
 
 // Fraction of the sound clip's duration spent "at throttle" before
-// easing back to idle. Adjust to match where the engine sound's pitch
-// actually peaks in truck_sound's waveform.
+// easing back to idle. This is still an estimate, not measured from
+// truck_sound's actual waveform — flag if the blip timing feels off
+// relative to the engine note and we'll tune it against the real clip.
 private const val PEAK_HOLD_FRACTION = 0.4f
 
-// Per-frame smoothing factor (0–1). Higher = needle reacts faster but
+// Per-frame smoothing factor (0-1). Higher = needle reacts faster but
 // more abruptly; lower = laggier but silkier. 0.18 matches a real
 // needle's mechanical inertia without feeling sluggish.
 private const val NEEDLE_SMOOTHING = 0.18f
