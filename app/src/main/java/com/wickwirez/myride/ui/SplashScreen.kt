@@ -29,17 +29,18 @@ import com.wickwirez.myride.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// Native pixel dimensions of splash_bg.png, used to map the needle's
-// hub position and the needle sprite's own size onto whatever size
-// the background actually renders at on a given device.
-private const val POSTER_W = 736f
-private const val POSTER_H = 1418f
+// Native pixel dimensions of the NEW splash_bg.png (re-extracted from the
+// updated poster source, 1000223139.png). Both assets below were rebuilt
+// from that same file, so all geometry here is measured in ITS coordinate
+// space, not the old 736x1418 asset's.
+private const val POSTER_W = 1024f
+private const val POSTER_H = 1535f
 
-// Hub (pivot) position in splash_bg.png pixel coordinates. Re-measured
-// via Hough circle fit directly on the bezel ring in splash_bg.png
-// (center 375.0, 277.8, radius 229.5) — precise to sub-pixel, not eyeballed.
-private const val HUB_X = 375.0f
-private const val HUB_Y = 277.8f
+// Hub (pivot) position in splash_bg.png pixel coordinates. Measured via
+// Hough circle fit directly on the bezel ring (center 516.75, 294.75,
+// radius 251.2) — precise to sub-pixel, not eyeballed.
+private const val HUB_X = 516.75f
+private const val HUB_Y = 294.75f
 
 // splash_needle.png is a square sprite centered exactly on the hub.
 private const val NEEDLE_SPRITE_SIZE = 420f
@@ -47,17 +48,18 @@ private const val NEEDLE_SPRITE_SIZE = 420f
 // rotationZ value that points the needle at each whole-number mark on the
 // dial (index = RPM x1000, e.g. ROT_AT_MARK[4] points at "4" / 4000 RPM).
 //
-// Re-measured directly from splash_bg.png: each number's angular position
-// was found by scanning bright pixels in an annulus around the hub, then
-// fit with a linear regression across marks 1-8 (residuals within +/-3
-// degrees, confirming near-uniform ~31.25 degree spacing). Mark "0" is
-// partially occluded by the "MY RIDE" logo artwork in this asset, so its
-// position is the regression's extrapolated value rather than a direct
-// pixel measurement. The whole array is anchored so mark 4 keeps its
-// previous value exactly (that position was confirmed correct), and
-// every other mark is corrected relative to it.
+// Built in two parts, both measured from this same source image:
+//  1. Each mark's raw angular position was carried over from the earlier
+//     precise measurement of the (nearly identical) gauge artwork, since
+//     this image's numbers were too low-contrast to re-detect reliably.
+//  2. The needle's own native "at rest" angle (rotationZ = 0) was measured
+//     fresh from THIS image, since the needle is actually drawn in it —
+//     found via a weighted centroid of the needle's red pixels in its
+//     clean tip zone: 234.64 degrees.
+// Every mark's rotationZ = (raw mark angle) - (needle's native angle), so
+// the sprite's real drawn orientation is the zero point.
 private val ROT_AT_MARK = floatArrayOf(
-    133.46f, 165.71f, 194.49f, 224.65f, 258.73f, 292.68f, 323.58f, 351.76f, 381.16f
+    -90.04f, -57.79f, -29.01f, 1.15f, 35.23f, 69.18f, 100.08f, 128.26f, 157.66f
 )
 
 // Converts a dial value (RPM x1000, e.g. 4.2f = 4200 RPM) to the
@@ -77,9 +79,8 @@ private const val IDLE_RPM = 0.8f
 private const val PEAK_RPM = 4.2f
 
 // Fraction of the sound clip's duration spent "at throttle" before
-// easing back to idle. This is still an estimate, not measured from
-// truck_sound's actual waveform — flag if the blip timing feels off
-// relative to the engine note and we'll tune it against the real clip.
+// easing back to idle. Still an estimate, not measured from truck_sound's
+// actual waveform — tune this once we nail the timing sync separately.
 private const val PEAK_HOLD_FRACTION = 0.4f
 
 // Per-frame smoothing factor (0-1). Higher = needle reacts faster but
