@@ -35,8 +35,8 @@ private const val POSTER_W = 736f
 private const val POSTER_H = 1418f
 
 // Hub (pivot) position in splash_bg.png pixel coordinates.
-private const val HUB_X = 367f
-private const val HUB_Y = 285f
+private const val HUB_X = 375f
+private const val HUB_Y = 283f
 
 // splash_needle.png is a square sprite centered exactly on the hub.
 private const val NEEDLE_SPRITE_SIZE = 420f
@@ -46,11 +46,11 @@ private const val NEEDLE_SPRITE_SIZE = 420f
 // Calibrated directly against the "1" and "7" tick marks on the dial
 // (not extrapolated), and kept strictly between them so the needle
 // never approaches the unmarked zone near 0/8 at the bottom.
-private const val ROT_IDLE = 189f       // sits right at "1"
-private const val ROT_REV1_PEAK = 11f   // sits right at "7"
-private const val ROT_DIP1 = 144f       // ~2.5
-private const val ROT_REV2_PEAK = 17f   // ~6.8, just shy of "7"
-private const val ROT_DIP2 = 115f       // ~3.5
+private const val ROT_IDLE = 168f       // sits right at "1" (measured)
+private const val ROT_REV1_PEAK = 348f  // sits right at "7" (measured)
+private const val ROT_DIP1 = 211f       // ~2.5
+private const val ROT_REV2_PEAK = 343f  // ~6.8, just shy of "7"
+private const val ROT_DIP2 = 242f       // ~3.5
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
