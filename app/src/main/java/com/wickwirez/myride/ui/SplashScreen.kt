@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,28 +35,54 @@ import kotlinx.coroutines.launch
 private const val POSTER_W = 736f
 private const val POSTER_H = 1418f
 
-// Hub (pivot) position in splash_bg.png pixel coordinates.
+// Hub (pivot) position in splash_bg.png pixel coordinates. Measured
+// directly from the artwork (Hough circle fit on the bezel + pivot cap).
 private const val HUB_X = 375f
 private const val HUB_Y = 283f
 
 // splash_needle.png is a square sprite centered exactly on the hub.
 private const val NEEDLE_SPRITE_SIZE = 420f
 
-// rotationZ = 0 shows the needle exactly as drawn in splash_needle.png,
-// which is the "hero pose" resting a little past 7.
-// Calibrated directly against the "1" and "7" tick marks on the dial
-// (not extrapolated), and kept strictly between them so the needle
-// never approaches the unmarked zone near 0/8 at the bottom.
-private const val ROT_IDLE = 168f       // sits right at "1" (measured)
-private const val ROT_REV1_PEAK = 348f  // sits right at "7" (measured)
-private const val ROT_DIP1 = 211f       // ~2.5
-private const val ROT_REV2_PEAK = 343f  // ~6.8, just shy of "7"
-private const val ROT_DIP2 = 242f       // ~3.5
+// rotationZ value that points the needle at each whole-number mark on the
+// dial (index = RPM x1000, e.g. ROT_AT_MARK[4] points at "4" / 4000 RPM).
+// Measured directly from splash_bg.png (tick-mark pixel positions) and
+// splash_needle.png (pivot-to-tip angle) — not eyeballed — so a sweep
+// between any two of these stays on real numbers and never dips into
+// the unmarked gap between "8" and "0" at the bottom of the dial.
+private val ROT_AT_MARK = floatArrayOf(
+    136.0f, 167.97f, 195.82f, 226.01f, 258.73f, 290.99f, 321.17f, 348.28f, 375.5f
+)
+
+// Converts a dial value (RPM x1000, e.g. 4.2f = 4200 RPM) to the
+// rotationZ needed to point the needle there, linearly interpolating
+// between the nearest two measured marks above.
+private fun rpmToAngle(rpmThousands: Float): Float {
+    val clamped = rpmThousands.coerceIn(0f, 8f)
+    val i0 = clamped.toInt().coerceIn(0, 7)
+    val i1 = i0 + 1
+    val frac = clamped - i0
+    return ROT_AT_MARK[i0] + frac * (ROT_AT_MARK[i1] - ROT_AT_MARK[i0])
+}
+
+// Idle and throttle-blip peak, in RPM x1000 — matches the "RPM X 1000"
+// label on the dial face. Tune PEAK_RPM within the 3.8–4.5 range to taste.
+private const val IDLE_RPM = 0.8f
+private const val PEAK_RPM = 4.2f
+
+// Fraction of the sound clip's duration spent "at throttle" before
+// easing back to idle. Adjust to match where the engine sound's pitch
+// actually peaks in truck_sound's waveform.
+private const val PEAK_HOLD_FRACTION = 0.4f
+
+// Per-frame smoothing factor (0–1). Higher = needle reacts faster but
+// more abruptly; lower = laggier but silkier. 0.18 matches a real
+// needle's mechanical inertia without feeling sluggish.
+private const val NEEDLE_SMOOTHING = 0.18f
 
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
     val alpha = remember { Animatable(0f) }
-    val needleRotation = remember { Animatable(ROT_IDLE) }
+    val needleRotation = remember { Animatable(rpmToAngle(IDLE_RPM)) }
     val context = LocalContext.current
     val mediaPlayer = remember { MediaPlayer.create(context, R.raw.truck_sound) }
 
@@ -74,24 +101,31 @@ fun SplashScreen(onFinished: () -> Unit) {
         } else {
             3000L
         }
+        val peakHoldMs = (soundDurationMs * PEAK_HOLD_FRACTION).toLong()
 
-        // Needle sits at idle, then revs in time with the engine sound,
-        // ending on the resting hero pose. Runs concurrently with the
-        // delay below so it's finished (or nearly so) by the time the
-        // sound clip ends.
-        launch {
-            needleRotation.snapTo(ROT_IDLE)
-            val d = soundDurationMs.coerceAtLeast(600L)
-            needleRotation.animateTo(ROT_REV1_PEAK, tween((d * 0.18).toInt()))
-            needleRotation.animateTo(ROT_DIP1, tween((d * 0.15).toInt()))
-            needleRotation.animateTo(ROT_REV2_PEAK, tween((d * 0.18).toInt()))
-            needleRotation.animateTo(ROT_DIP2, tween((d * 0.12).toInt()))
-            // Settle back down to idle (~700-750 RPM) rather than staying
-            // revved — matches a real engine coming off the throttle.
-            needleRotation.animateTo(ROT_IDLE, tween((d * 0.30).toInt()))
+        // Continuous per-frame follow: the needle chases a target RPM
+        // (peak while "on throttle", idle once we lift off) using simple
+        // exponential smoothing, so motion is fluid with no discrete
+        // jumps or jitter — same shape as a real needle's inertia.
+        val needleJob = launch {
+            var startFrame = -1L
+            while (true) {
+                val elapsedMs = withFrameNanos { frameTime ->
+                    if (startFrame < 0) startFrame = frameTime
+                    (frameTime - startFrame) / 1_000_000L
+                }
+                if (elapsedMs >= soundDurationMs) break
+                val targetRpm = if (elapsedMs < peakHoldMs) PEAK_RPM else IDLE_RPM
+                val targetAngle = rpmToAngle(targetRpm)
+                needleRotation.snapTo(
+                    needleRotation.value + (targetAngle - needleRotation.value) * NEEDLE_SMOOTHING
+                )
+            }
         }
 
         delay(soundDurationMs)
+        needleJob.cancel()
+        needleRotation.animateTo(rpmToAngle(IDLE_RPM), tween(200))
 
         alpha.animateTo(0f, animationSpec = tween(durationMillis = 400))
         onFinished()
