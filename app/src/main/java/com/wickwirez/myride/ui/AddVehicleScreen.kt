@@ -28,6 +28,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.wickwirez.myride.R
+import com.wickwirez.myride.data.CAR_MAKES
+import com.wickwirez.myride.data.MODELS_BY_MAKE
 import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
 import com.wickwirez.myride.model.Vehicle
@@ -151,19 +153,36 @@ fun AddVehicleScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
+            val makeOptions = remember(make) {
+                if (make.isBlank()) CAR_MAKES
+                else CAR_MAKES.filter { it.contains(make.trim(), ignoreCase = true) }
+            }
+            EditableDropdownField(
                 value = make,
-                onValueChange = { make = it },
-                label = { Text("Make") },
+                onValueChange = {
+                    make = it
+                    model = ""
+                },
+                label = "Make",
+                options = makeOptions,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
+            val modelOptions = remember(make, model) {
+                val allModelsForMake = MODELS_BY_MAKE.entries
+                    .firstOrNull { it.key.equals(make.trim(), ignoreCase = true) }
+                    ?.value
+                    ?: emptyList()
+                if (model.isBlank()) allModelsForMake
+                else allModelsForMake.filter { it.contains(model.trim(), ignoreCase = true) }
+            }
+            EditableDropdownField(
                 value = model,
                 onValueChange = { model = it },
-                label = { Text("Model") },
+                label = "Model",
+                options = modelOptions,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -255,7 +274,6 @@ fun AddVehicleScreen(
                 onClick = {
                     val parsedYear = year.toIntOrNull() ?: return@Button
                     val mileage = currentMileage.toIntOrNull() ?: 0
-
                     onSave(
                         Vehicle(
                             nickname = nickname.trim(),
@@ -274,6 +292,52 @@ fun AddVehicleScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditableDropdownField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    options: List<String>,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val showMenu = expanded && options.isNotEmpty()
+
+    ExposedDropdownMenuBox(
+        expanded = showMenu,
+        onExpandedChange = { expanded = it },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                expanded = true
+            },
+            label = { Text(label) },
+            singleLine = true,
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                .fillMaxWidth()
+        )
+        ExposedDropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onValueChange(option)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
