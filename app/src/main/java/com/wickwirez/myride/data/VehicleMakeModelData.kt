@@ -50,5 +50,3 @@ val MODELS_BY_MAKE: Map<String, List<String>> = mapOf(
 val VEHICLE_YEARS: List<Int> = (java.time.Year.now().value + 1 downTo 1980).toList()
 
 val FUEL_TYPES: List<String> = listOf("Regular", "Mid-Grade", "Premium", "Diesel", "E85", "Electric")
-
-val FUEL_TYPES: List<String> = listOf("Regular", "Mid-Grade", "Premium", "Diesel", "E85", "Electric")
