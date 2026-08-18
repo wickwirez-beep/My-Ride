@@ -1,3 +1,0 @@
-import com.wickwirez.myride.data.CAR_MAKES
-import com.wickwirez.myride.data.MODELS_BY_MAKE
-import com.wickwirez.myride.data.VEHICLE_YEARS

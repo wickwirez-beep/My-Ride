@@ -1,7 +1,0 @@
-            Text(
-                "100% Ad-Free \u2014 No Ads, Ever.",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.height(16.dp))
