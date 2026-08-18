@@ -25,5 +25,6 @@ data class FuelLog(
     val mileage: Int,
     val gallons: Double,
     val cost: Double = 0.0,
-    val notes: String = ""
+    val notes: String = "",
+    val fuelType: String = ""
 )
