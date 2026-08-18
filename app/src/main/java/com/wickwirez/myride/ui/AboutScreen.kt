@@ -62,6 +62,13 @@ fun AboutScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "100% Ad-Free \u2014 No Ads, Ever.",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
             Spacer(Modifier.height(16.dp))
             Text(
                 "Vehicle photos, VIN decode and scanning, maintenance reminders, " +

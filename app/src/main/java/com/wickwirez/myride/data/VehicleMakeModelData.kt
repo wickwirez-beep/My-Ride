@@ -46,3 +46,5 @@ val MODELS_BY_MAKE: Map<String, List<String>> = mapOf(
     "Volkswagen" to listOf("Atlas", "Golf", "ID.4", "Jetta", "Taos", "Tiguan"),
     "Volvo" to listOf("S60", "S90", "XC40", "XC60", "XC90", "EX30", "EX90")
 )
+
+val VEHICLE_YEARS: List<Int> = (java.time.Year.now().value + 1 downTo 1980).toList()
