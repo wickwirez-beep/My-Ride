@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.wickwirez.myride.data.FUEL_TYPES
 import com.wickwirez.myride.model.FuelLog
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -62,6 +63,8 @@ private fun EditFuelLogForm(
     var gallons by remember(log.id) { mutableStateOf(log.gallons.toString()) }
     var cost by remember(log.id) { mutableStateOf(if (log.cost > 0) log.cost.toString() else "") }
     var notes by remember(log.id) { mutableStateOf(log.notes) }
+    var fuelType by remember(log.id) { mutableStateOf(log.fuelType.ifBlank { FUEL_TYPES.first() }) }
+    var fuelTypeExpanded by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -134,6 +137,38 @@ private fun EditFuelLogForm(
 
             Spacer(Modifier.height(10.dp))
 
+            ExposedDropdownMenuBox(
+                expanded = fuelTypeExpanded,
+                onExpandedChange = { fuelTypeExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = fuelType,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fuel Type") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelTypeExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = fuelTypeExpanded,
+                    onDismissRequest = { fuelTypeExpanded = false }
+                ) {
+                    FUEL_TYPES.forEach { type ->
+                        DropdownMenuItem(
+                            text = { Text(type) },
+                            onClick = {
+                                fuelType = type
+                                fuelTypeExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
+
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -168,7 +203,8 @@ private fun EditFuelLogForm(
                                 mileage = parsedMileage,
                                 gallons = parsedGallons,
                                 cost = parsedCost,
-                                notes = notes.trim()
+                                notes = notes.trim(),
+                                fuelType = fuelType
                             )
                         )
                     } else {

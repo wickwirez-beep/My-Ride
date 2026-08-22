@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.wickwirez.myride.data.FUEL_TYPES
 import com.wickwirez.myride.model.FuelLog
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -29,6 +30,8 @@ fun AddFuelLogScreen(
     var gallons by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf(FUEL_TYPES.first()) }
+    var fuelTypeExpanded by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -95,6 +98,38 @@ fun AddFuelLogScreen(
 
             Spacer(Modifier.height(10.dp))
 
+            ExposedDropdownMenuBox(
+                expanded = fuelTypeExpanded,
+                onExpandedChange = { fuelTypeExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = fuelType,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fuel Type") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelTypeExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = fuelTypeExpanded,
+                    onDismissRequest = { fuelTypeExpanded = false }
+                ) {
+                    FUEL_TYPES.forEach { type ->
+                        DropdownMenuItem(
+                            text = { Text(type) },
+                            onClick = {
+                                fuelType = type
+                                fuelTypeExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
+
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -130,7 +165,8 @@ fun AddFuelLogScreen(
                                 mileage = parsedMileage,
                                 gallons = parsedGallons,
                                 cost = parsedCost,
-                                notes = notes.trim()
+                                notes = notes.trim(),
+                                fuelType = fuelType
                             )
                         )
                     } else {
