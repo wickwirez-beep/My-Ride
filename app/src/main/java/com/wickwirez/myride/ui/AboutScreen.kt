@@ -9,6 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,10 +25,15 @@ import androidx.compose.ui.unit.dp
 import com.wickwirez.myride.BuildConfig
 import com.wickwirez.myride.R
 
+// TODO: replace with your real Ko-fi / Buy Me a Coffee / PayPal.me link
+private const val DONATE_URL = "https://ko-fi.com/wickwirez"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+    var showSupportDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -90,6 +99,10 @@ fun AboutScreen(onBack: () -> Unit) {
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(24.dp))
+            Button(onClick = { showSupportDialog = true }) {
+                Text("\u2764\uFE0F Support My Ride")
+            }
+            Spacer(Modifier.height(12.dp))
             OutlinedButton(onClick = {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
                     data = Uri.parse("mailto:")
@@ -101,5 +114,33 @@ fun AboutScreen(onBack: () -> Unit) {
                 Text("Send Feedback")
             }
         }
+    }
+
+    if (showSupportDialog) {
+        AlertDialog(
+            onDismissRequest = { showSupportDialog = false },
+            title = { Text("Support My Ride") },
+            text = {
+                Text(
+                    "Hi, I'm Wick \u2014 I built My Ride solo, from my phone, with no ad revenue " +
+                        "funding it. If the app's been useful for tracking your vehicle, a small " +
+                        "tip helps keep it going and helps me keep shipping new features."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DONATE_URL))
+                    context.startActivity(intent)
+                    showSupportDialog = false
+                }) {
+                    Text("\u2764\uFE0F Thank You! \u2014 \$1.99")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSupportDialog = false }) {
+                    Text("Maybe Later")
+                }
+            }
+        )
     }
 }
