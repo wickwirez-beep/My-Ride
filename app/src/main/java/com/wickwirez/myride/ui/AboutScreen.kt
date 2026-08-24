@@ -26,7 +26,7 @@ import com.wickwirez.myride.BuildConfig
 import com.wickwirez.myride.R
 
 // TODO: replace with your real Ko-fi / Buy Me a Coffee / PayPal.me link
-private const val DONATE_URL = "https://ko-fi.com/wickwirez"
+private const val DONATE_URL = "https://ko-fi.com/harlancowan"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
