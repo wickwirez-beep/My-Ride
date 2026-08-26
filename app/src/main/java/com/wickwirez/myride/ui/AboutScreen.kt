@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.wickwirez.myride.BuildConfig
 import com.wickwirez.myride.R
 
-private const val DONATE_URL = "https://ko-fi.com/Wick"
+private const val DONATE_URL = "https://ko-fi.com/harlancowan"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
