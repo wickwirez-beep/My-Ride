@@ -1,5 +1,10 @@
 package com.wickwirez.myride.ui
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,12 +18,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.wickwirez.myride.data.ApiKeyStore
 import com.wickwirez.myride.data.BackupManager
 import com.wickwirez.myride.data.VehicleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private fun Context.findActivity(): Activity? {
+    var ctx = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
+}
+
+private fun openPlayStoreListing(context: Context) {
+    val packageName = context.packageName
+    try {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
+                .setPackage("com.android.vending")
+        )
+    } catch (e: ActivityNotFoundException) {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
+        )
+    }
+}
+
+private fun requestInAppReview(context: Context) {
+    val activity = context.findActivity()
+    if (activity == null) {
+        openPlayStoreListing(context)
+        return
+    }
+    val manager = ReviewManagerFactory.create(context)
+    val request = manager.requestReviewFlow()
+    request.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val reviewInfo = task.result
+            manager.launchReviewFlow(activity, reviewInfo)
+            // No completion callback is used here on purpose: Google's API contract
+            // doesn't guarantee the dialog was actually shown (it's quota-limited),
+            // so there's nothing reliable to react to either way.
+        } else {
+            openPlayStoreListing(context)
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -195,6 +245,22 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                 Spacer(Modifier.height(12.dp))
                 Text(backupStatus!!, color = MaterialTheme.colorScheme.primary)
             }
+
+            Spacer(Modifier.height(32.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(24.dp))
+
+            Text("Enjoying My Ride?", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "If it's been useful, a quick rating helps a lot.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(Modifier.height(16.dp))
+            Button(onClick = { requestInAppReview(context) }) {
+                Text("Rate My Ride")
+            }
+
             Spacer(Modifier.height(32.dp))
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
