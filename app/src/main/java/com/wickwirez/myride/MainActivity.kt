@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -28,6 +29,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.wickwirez.myride.data.OnboardingPrefs
 import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.ui.AboutScreen
 import com.wickwirez.myride.ui.AddServiceRecordScreen
@@ -48,6 +50,7 @@ import com.wickwirez.myride.ui.FuelLogScreen
 import com.wickwirez.myride.ui.FuelLogViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
+import com.wickwirez.myride.ui.OnboardingScreen
 import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.SplashScreen
@@ -109,15 +112,28 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         }
     ) {
         composable("splash") {
+            val context = LocalContext.current
             SplashScreen(
                 onFinished = {
-                    navController.navigate("garage") {
+                    val destination = if (OnboardingPrefs.hasSeenOnboarding(context)) "garage" else "onboarding"
+                    navController.navigate(destination) {
                         popUpTo("splash") { inclusive = true }
                     }
                 }
             )
         }
 
+        composable("onboarding") {
+            val context = LocalContext.current
+            OnboardingScreen(
+                onFinished = {
+                    OnboardingPrefs.setSeenOnboarding(context)
+                    navController.navigate("garage") {
+                        popUpTo("onboarding") { inclusive = true }
+                    }
+                }
+            )
+        }
 
         composable("garage") {
             val viewModel: GarageViewModel =
