@@ -257,7 +257,7 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(16.dp))
-            Button(onClick = { requestInAppReview(context) }) {
+            Button(onClick = { openPlayStoreListing(context) }) {
                 Text("Rate My Ride")
             }
 
