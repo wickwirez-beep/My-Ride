@@ -8,6 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,7 +38,7 @@ private fun Context.findActivity(): Activity? {
 }
 
 private fun openPlayStoreListing(context: Context) {
-    val packageName = context.packageName
+    val packageName = "com.wickwirez.myride" // always point at the published listing, even from a .tester/.debug build
     try {
         context.startActivity(
             Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
@@ -159,6 +161,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(20.dp)
         ) {
             Text("Gemini API Key", style = MaterialTheme.typography.titleMedium)
