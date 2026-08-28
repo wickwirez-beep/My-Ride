@@ -72,7 +72,13 @@ private fun requestInAppReview(context: Context) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBack: () -> Unit) {
+fun SettingsScreen(
+    repository: VehicleRepository,
+    onOpenHelp: () -> Unit,
+    onReplayOnboarding: () -> Unit,
+    onOpenAbout: () -> Unit,
+    onBack: () -> Unit
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -264,7 +270,35 @@ fun SettingsScreen(repository: VehicleRepository, onOpenAbout: () -> Unit, onBac
             Spacer(Modifier.height(32.dp))
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
-            TextButton(onClick = onOpenAbout) {
+
+            Text(
+                text = "Help & Support",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(
+                onClick = onOpenHelp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Help & FAQ")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(
+                onClick = onReplayOnboarding,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Replay Welcome Tour")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            TextButton(
+                onClick = onOpenAbout,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("About My Ride")
             }
         }

@@ -30,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wickwirez.myride.data.OnboardingPrefs
+import com.wickwirez.myride.data.ReviewPromptManager
 import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.ui.AboutScreen
 import com.wickwirez.myride.ui.AddServiceRecordScreen
@@ -50,6 +51,7 @@ import com.wickwirez.myride.ui.FuelLogScreen
 import com.wickwirez.myride.ui.FuelLogViewModel
 import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
+import com.wickwirez.myride.ui.HelpScreen
 import com.wickwirez.myride.ui.OnboardingScreen
 import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
@@ -135,6 +137,12 @@ private fun MyRideNavHost(repository: VehicleRepository) {
             )
         }
 
+        composable("onboarding_replay") {
+            OnboardingScreen(
+                onFinished = { navController.popBackStack() }
+            )
+        }
+
         composable("garage") {
             val viewModel: GarageViewModel =
                 viewModel(factory = GarageViewModel.factory(repository))
@@ -157,7 +165,18 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         composable("settings") {
             SettingsScreen(
                 repository = repository,
+                onOpenHelp = { navController.navigate("help") },
+                onReplayOnboarding = { navController.navigate("onboarding_replay") },
                 onOpenAbout = { navController.navigate("about") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("help") {
+            HelpScreen(
+                onReplayWelcomeTour = {
+                    navController.navigate("onboarding_replay")
+                },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -390,12 +409,14 @@ private fun MyRideNavHost(repository: VehicleRepository) {
             val detailViewModel: VehicleDetailViewModel =
                 viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
             val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
+            val context = LocalContext.current
 
             AddServiceRecordScreen(
                 vehicleId = vehicleId,
                 currentMileage = uiState.vehicle?.currentMileage ?: 0,
                 onSave = { record ->
                     viewModel.saveRecord(record) {
+                        ReviewPromptManager.recordSuccessfulAction(context)
                         navController.popBackStack()
                     }
                 },
