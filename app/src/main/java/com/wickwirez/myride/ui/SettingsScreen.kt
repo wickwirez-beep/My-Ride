@@ -39,14 +39,12 @@ private fun Context.findActivity(): Activity? {
 
 private fun openPlayStoreListing(context: Context) {
     val packageName = "com.wickwirez.myride" // always point at the published listing, even from a .tester/.debug build
-    android.widget.Toast.makeText(context, "DEBUG: opening id=$packageName (running as ${context.packageName})", android.widget.Toast.LENGTH_LONG).show()
     try {
         context.startActivity(
             Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
                 .setPackage("com.android.vending")
         )
     } catch (e: ActivityNotFoundException) {
-        android.widget.Toast.makeText(context, "DEBUG: market:// failed, using web fallback", android.widget.Toast.LENGTH_LONG).show()
         context.startActivity(
             Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
         )
