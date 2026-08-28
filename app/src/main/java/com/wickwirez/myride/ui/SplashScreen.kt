@@ -44,10 +44,14 @@ fun SplashScreen(onFinished: () -> Unit) {
     LaunchedEffect(Unit) {
         alpha.animateTo(1f, animationSpec = tween(durationMillis = 500))
 
-        val soundDurationMs = if (mediaPlayer != null) {
-            mediaPlayer.start()
-            mediaPlayer.duration.toLong().coerceIn(0L, 8000L)
-        } else {
+        val soundDurationMs = try {
+            if (mediaPlayer != null) {
+                mediaPlayer.start()
+                mediaPlayer.duration.toLong().coerceIn(500L, 8000L)
+            } else {
+                3000L
+            }
+        } catch (e: Exception) {
             3000L
         }
         delay(soundDurationMs)
