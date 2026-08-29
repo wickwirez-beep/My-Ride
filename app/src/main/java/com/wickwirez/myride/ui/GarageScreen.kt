@@ -39,6 +39,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import com.wickwirez.myride.data.MascotPrefs
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.wickwirez.myride.R
@@ -75,7 +77,9 @@ fun GarageScreen(
                 .background(Color(0x99000000))
         )
 
-    MascotWidget(modifier = Modifier.align(Alignment.BottomStart).zIndex(10f))
+    if (MascotPrefs.isEnabled(LocalContext.current)) {
+        MascotWidget(modifier = Modifier.align(Alignment.BottomStart).zIndex(10f))
+    }
 
         Scaffold(
         containerColor = Color.Transparent,
