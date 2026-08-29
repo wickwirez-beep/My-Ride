@@ -37,17 +37,23 @@ import java.util.Locale
 fun AddServiceRecordScreen(
     vehicleId: Long,
     currentMileage: Int,
+    initialType: ServiceType? = null,
+    initialDateMillis: Long? = null,
+    initialMileage: Int? = null,
+    initialCost: Double? = null,
+    initialShopName: String = "",
+    initialNotes: String = "",
     onSave: (ServiceRecord) -> Unit,
     onBack: () -> Unit
 ) {
-    var type by remember { mutableStateOf(ServiceType.OIL_CHANGE) }
+    var type by remember { mutableStateOf(initialType ?: ServiceType.OIL_CHANGE) }
     var typeMenuExpanded by remember { mutableStateOf(false) }
-    var dateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    var dateMillis by remember { mutableStateOf(initialDateMillis ?: System.currentTimeMillis()) }
     var showDatePicker by remember { mutableStateOf(false) }
-    var mileage by remember { mutableStateOf(if (currentMileage > 0) currentMileage.toString() else "") }
-    var cost by remember { mutableStateOf("") }
-    var shopName by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
+    var mileage by remember { mutableStateOf(initialMileage?.toString() ?: (if (currentMileage > 0) currentMileage.toString() else "")) }
+    var cost by remember { mutableStateOf(initialCost?.takeIf { it > 0 }?.toString() ?: "") }
+    var shopName by remember { mutableStateOf(initialShopName) }
+    var notes by remember { mutableStateOf(initialNotes) }
     var reminderMiles by remember { mutableStateOf("") }
     var reminderDays by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
