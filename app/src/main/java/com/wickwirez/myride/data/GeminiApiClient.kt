@@ -27,8 +27,8 @@ object GeminiApiClient {
             connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
                 doOutput = true
-                connectTimeout = 20000
-                readTimeout = 30000
+                connectTimeout = 30000
+                readTimeout = 90000
                 setRequestProperty("Content-Type", "application/json")
                 setRequestProperty("x-goog-api-key", apiKey)
             }
@@ -115,8 +115,8 @@ object GeminiApiClient {
             connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
                 doOutput = true
-                connectTimeout = 20000
-                readTimeout = 30000
+                connectTimeout = 30000
+                readTimeout = 90000
                 setRequestProperty("Content-Type", "application/json")
                 setRequestProperty("x-goog-api-key", apiKey)
             }

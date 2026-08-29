@@ -1,7 +1,10 @@
 package com.wickwirez.myride.ui
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import java.io.ByteArrayOutputStream
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -68,14 +71,14 @@ fun PhotoServiceRecordScreen(
         error = null
         coroutineScope.launch {
             try {
-                val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                if (bytes == null) {
+                val compressedBytes = resizeAndCompressImage(context, uri)
+                if (compressedBytes == null) {
                     error = "Couldn't read that photo."
                     analyzing = false
                     return@launch
                 }
-                val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
-                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+                val base64 = Base64.encodeToString(compressedBytes, Base64.NO_WRAP)
+                val mimeType = "image/jpeg"
                 val result = GeminiApiClient.sendImageDiagnosis(
                     key, systemPrompt, "Extract the service details from this receipt photo.", base64, mimeType
                 )
@@ -199,6 +202,26 @@ fun PhotoServiceRecordScreen(
                 Spacer(Modifier.height(16.dp))
             }
         }
+    }
+}
+
+private fun resizeAndCompressImage(context: android.content.Context, uri: Uri): ByteArray? {
+    return try {
+        val input = context.contentResolver.openInputStream(uri) ?: return null
+        val original = input.use { BitmapFactory.decodeStream(it) } ?: return null
+        val maxDim = 1600
+        val longestSide = maxOf(original.width, original.height)
+        val scale = if (longestSide > maxDim) maxDim.toFloat() / longestSide else 1f
+        val scaled = if (scale < 1f) {
+            Bitmap.createScaledBitmap(original, (original.width * scale).toInt(), (original.height * scale).toInt(), true)
+        } else {
+            original
+        }
+        val output = ByteArrayOutputStream()
+        scaled.compress(Bitmap.CompressFormat.JPEG, 85, output)
+        output.toByteArray()
+    } catch (e: Exception) {
+        null
     }
 }
 
