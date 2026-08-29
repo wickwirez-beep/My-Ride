@@ -183,7 +183,7 @@ fun AiMechanicScreen(
                 OutlinedTextField(
                     value = userNote,
                     onValueChange = { userNote = it },
-                    label = { Text("Anything to add? (optional)") },
+                    label = { Text("Describe the issue") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
