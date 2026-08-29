@@ -1,6 +1,7 @@
 package com.wickwirez.myride.ui
 
 import com.wickwirez.myride.model.ServiceRecord
+import com.wickwirez.myride.model.ServiceType
 import com.wickwirez.myride.model.Vehicle
 
 enum class DueStatus { NONE, OK, DUE_SOON, OVERDUE }
@@ -8,13 +9,35 @@ enum class DueStatus { NONE, OK, DUE_SOON, OVERDUE }
 private const val MS_PER_DAY = 24L * 60 * 60 * 1000
 private const val DUE_SOON_FRACTION = 0.1
 
+// Fallback reminder interval applied to Oil Change records that don't have
+// an explicit reminder set, so the health gauge has something to track even
+// when the user skips the optional reminder fields.
+private const val DEFAULT_OIL_CHANGE_MILES = 5000
+private const val DEFAULT_OIL_CHANGE_DAYS = 180
+
+private fun effectiveIntervalMiles(record: ServiceRecord): Int? =
+    record.reminderIntervalMiles
+        ?: if (record.reminderIntervalDays == null && record.type == ServiceType.OIL_CHANGE) {
+            DEFAULT_OIL_CHANGE_MILES
+        } else {
+            null
+        }
+
+private fun effectiveIntervalDays(record: ServiceRecord): Int? =
+    record.reminderIntervalDays
+        ?: if (record.reminderIntervalMiles == null && record.type == ServiceType.OIL_CHANGE) {
+            DEFAULT_OIL_CHANGE_DAYS
+        } else {
+            null
+        }
+
 fun computeDueStatus(vehicle: Vehicle, record: ServiceRecord?, nowMs: Long): DueStatus {
     if (record == null) return DueStatus.NONE
 
     var overdue = false
     var dueSoon = false
 
-    record.reminderIntervalMiles?.let { interval ->
+    effectiveIntervalMiles(record)?.let { interval ->
         if (interval > 0) {
             val remaining = (record.mileage + interval) - vehicle.currentMileage
             val threshold = (interval * DUE_SOON_FRACTION).coerceAtLeast(1.0)
@@ -25,7 +48,7 @@ fun computeDueStatus(vehicle: Vehicle, record: ServiceRecord?, nowMs: Long): Due
         }
     }
 
-    record.reminderIntervalDays?.let { interval ->
+    effectiveIntervalDays(record)?.let { interval ->
         if (interval > 0) {
             val dueAtMs = record.date + interval * MS_PER_DAY
             val remainingDays = (dueAtMs - nowMs) / MS_PER_DAY
@@ -74,14 +97,14 @@ fun computeHealthScore(vehicle: Vehicle, records: List<ServiceRecord>, nowMs: Lo
     var worstFraction = 1.0
 
     records.forEach { record ->
-        record.reminderIntervalMiles?.let { interval ->
+        effectiveIntervalMiles(record)?.let { interval ->
             if (interval > 0) {
                 val remaining = (record.mileage + interval) - vehicle.currentMileage
                 val fraction = (remaining.toDouble() / interval).coerceIn(0.0, 1.0)
                 worstFraction = minOf(worstFraction, fraction)
             }
         }
-        record.reminderIntervalDays?.let { interval ->
+        effectiveIntervalDays(record)?.let { interval ->
             if (interval > 0) {
                 val dueAtMs = record.date + interval * MS_PER_DAY
                 val remainingDays = (dueAtMs - nowMs) / MS_PER_DAY

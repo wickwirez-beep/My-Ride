@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.model.ServiceRecord
+import com.wickwirez.myride.model.ServiceType
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,7 @@ class VehicleDetailViewModel(
         repository.getTotalCostForVehicle(vehicleId)
     ) { vehicle, records, totalCost ->
         val reminderRecords = records.filter {
-            it.reminderIntervalMiles != null || it.reminderIntervalDays != null
+            it.reminderIntervalMiles != null || it.reminderIntervalDays != null || it.type == ServiceType.OIL_CHANGE
         }
         val dueStatus = if (vehicle != null) {
             computeWorstDueStatus(vehicle, reminderRecords, System.currentTimeMillis())

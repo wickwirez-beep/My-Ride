@@ -257,6 +257,7 @@ fun VehicleDetailScreen(
 
 @Composable
 private fun ServiceRecordRow(record: ServiceRecord, onClick: () -> Unit, onDuplicate: () -> Unit) {
+    var lastDuplicateClickMs by remember { mutableStateOf(0L) }
     ElevatedCard(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
@@ -267,7 +268,16 @@ private fun ServiceRecordRow(record: ServiceRecord, onClick: () -> Unit, onDupli
                 Text(record.type.name.replace('_', ' '), fontWeight = FontWeight.Bold)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(formatCost(record.cost))
-                    IconButton(onClick = onDuplicate, modifier = Modifier.size(32.dp)) {
+                    IconButton(
+                        onClick = {
+                            val now = System.currentTimeMillis()
+                            if (now - lastDuplicateClickMs > 800) {
+                                lastDuplicateClickMs = now
+                                onDuplicate()
+                            }
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
                         Icon(
                             Icons.Default.ContentCopy,
                             contentDescription = "Duplicate this entry",
