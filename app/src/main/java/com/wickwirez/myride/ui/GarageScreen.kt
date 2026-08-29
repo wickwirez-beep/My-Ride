@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.wickwirez.myride.R
@@ -67,7 +68,18 @@ fun GarageScreen(
                 .background(Color(0x99000000))
         )
 
-    Scaffold(
+    Image(
+            painter = painterResource(id = R.drawable.mascot_wick),
+            contentDescription = "Wick",
+            modifier = Modifier
+                .size(width = 68.dp, height = 160.dp)
+                .align(Alignment.BottomStart)
+                .padding(start = 8.dp, bottom = 8.dp)
+                .zIndex(10f),
+            contentScale = ContentScale.Fit
+        )
+
+        Scaffold(
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
