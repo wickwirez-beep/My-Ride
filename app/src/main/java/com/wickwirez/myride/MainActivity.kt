@@ -41,6 +41,7 @@ import com.wickwirez.myride.ui.AddVehicleScreen
 import com.wickwirez.myride.ui.AddVehicleViewModel
 import com.wickwirez.myride.ui.AiAssistantScreen
 import com.wickwirez.myride.ui.AiMechanicScreen
+import com.wickwirez.myride.ui.PhotoServiceRecordScreen
 import com.wickwirez.myride.ui.EditServiceRecordScreen
 import com.wickwirez.myride.ui.EditServiceRecordViewModel
 import com.wickwirez.myride.ui.EditFuelLogScreen
@@ -245,6 +246,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onOpenSpecs = { navController.navigate("vehicle_specs/$vehicleId") },
                 onOpenDocuments = { navController.navigate("documents/$vehicleId") },
                 onOpenAiMechanic = { navController.navigate("ai_mechanic/$vehicleId") },
+                onOpenPhotoServiceLog = { navController.navigate("photo_service_record/$vehicleId") },
                 onMarkParkedSpot = { lat, lng, timestamp ->
                     viewModel.markParkedLocation(lat, lng, timestamp)
                 },
@@ -395,6 +397,32 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 vehicle = uiState.vehicle,
                 records = uiState.records,
                 onOpenSettings = { navController.navigate("settings") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "photo_service_record/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getLong("vehicleId") ?: return@composable
+            val viewModel: AddServiceRecordViewModel =
+                viewModel(factory = AddServiceRecordViewModel.factory(repository))
+            val detailViewModel: VehicleDetailViewModel =
+                viewModel(factory = VehicleDetailViewModel.factory(repository, vehicleId))
+            val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
+            val context = LocalContext.current
+
+            PhotoServiceRecordScreen(
+                vehicleId = vehicleId,
+                currentMileage = uiState.vehicle?.currentMileage ?: 0,
+                onOpenSettings = { navController.navigate("settings") },
+                onSave = { record ->
+                    viewModel.saveRecord(record) {
+                        ReviewPromptManager.recordSuccessfulAction(context)
+                        navController.popBackStack()
+                    }
+                },
                 onBack = { navController.popBackStack() }
             )
         }

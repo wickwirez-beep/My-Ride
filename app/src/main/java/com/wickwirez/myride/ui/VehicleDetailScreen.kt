@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Warning
@@ -61,6 +62,7 @@ fun VehicleDetailScreen(
     onOpenSpecs: () -> Unit = {},
     onOpenDocuments: () -> Unit = {},
     onOpenAiMechanic: () -> Unit = {},
+    onOpenPhotoServiceLog: () -> Unit = {},
     onMarkParkedSpot: (Double, Double, Long) -> Unit = { _, _, _ -> },
     onClearParkedSpot: () -> Unit = {},
     onBack: () -> Unit
@@ -120,6 +122,11 @@ fun VehicleDetailScreen(
                                 text = { Text("AI Mechanic") },
                                 leadingIcon = { Icon(Icons.Default.Build, contentDescription = null) },
                                 onClick = { menuExpanded = false; onOpenAiMechanic() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Photo Service Log") },
+                                leadingIcon = { Icon(Icons.Default.CameraAlt, contentDescription = null) },
+                                onClick = { menuExpanded = false; onOpenPhotoServiceLog() }
                             )
                             DropdownMenuItem(
                                 text = { Text("Check for Recalls") },
