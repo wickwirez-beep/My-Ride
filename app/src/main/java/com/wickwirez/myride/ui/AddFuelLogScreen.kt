@@ -81,7 +81,7 @@ fun AddFuelLogScreen(
             OutlinedTextField(
                 value = gallons,
                 onValueChange = { gallons = it },
-                label = { Text("Gallons") },
+                label = { Text(if (fuelType == "Electric") "kWh" else "Gallons") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -141,7 +141,7 @@ fun AddFuelLogScreen(
             if (showError) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Please enter a valid mileage and gallons.",
+                    "Please enter a valid mileage and " + (if (fuelType == "Electric") "kWh." else "gallons."),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
