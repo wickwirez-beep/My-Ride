@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wickwirez.myride.data.ApiKeyStore
 import com.wickwirez.myride.data.BackupManager
+import com.wickwirez.myride.data.MascotPrefs
 import com.wickwirez.myride.data.VehicleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,6 +91,7 @@ fun SettingsScreen(
     var saved by remember { mutableStateOf(false) }
     var backupStatus by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
+    var mascotEnabled by remember { mutableStateOf(MascotPrefs.isEnabled(context)) }
 
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -272,6 +275,32 @@ fun SettingsScreen(
             }
 
             Spacer(Modifier.height(32.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(24.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Show Wick", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Toggle the mascot on the Garage screen.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Switch(
+                    checked = mascotEnabled,
+                    onCheckedChange = {
+                        mascotEnabled = it
+                        MascotPrefs.setEnabled(context, it)
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
 
