@@ -132,7 +132,7 @@ fun AboutScreen(onBack: () -> Unit) {
                     context.startActivity(intent)
                     showSupportDialog = false
                 }) {
-                    Text("\u2764\uFE0F Thank You! \u2014 \$1.99")
+                    Text("\u2764\uFE0F Thank You! \u2014 \$2.99")
                 }
             },
             dismissButton = {
