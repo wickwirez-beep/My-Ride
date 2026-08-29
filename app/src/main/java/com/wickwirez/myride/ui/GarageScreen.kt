@@ -32,6 +32,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.wickwirez.myride.R
@@ -68,16 +75,7 @@ fun GarageScreen(
                 .background(Color(0x99000000))
         )
 
-    Image(
-            painter = painterResource(id = R.drawable.mascot_wick),
-            contentDescription = "Wick",
-            modifier = Modifier
-                .size(width = 68.dp, height = 160.dp)
-                .align(Alignment.BottomStart)
-                .padding(start = 8.dp, bottom = 8.dp)
-                .zIndex(10f),
-            contentScale = ContentScale.Fit
-        )
+    MascotWidget(modifier = Modifier.align(Alignment.BottomStart).zIndex(10f))
 
         Scaffold(
         containerColor = Color.Transparent,
@@ -296,4 +294,44 @@ private fun VehicleCard(
             }
         }
     }
+}
+
+
+@Composable
+private fun MascotWidget(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "mascot_idle")
+
+    val bob by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "mascot_bob"
+    )
+
+    val sway by infiniteTransition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "mascot_sway"
+    )
+
+    Image(
+        painter = painterResource(id = R.drawable.mascot_wick),
+        contentDescription = "Wick",
+        modifier = modifier
+            .padding(start = 8.dp, bottom = 8.dp)
+            .size(width = 68.dp, height = 160.dp)
+            .graphicsLayer {
+                translationY = -bob * 6f
+                rotationZ = sway * 2.5f
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
+            },
+        contentScale = ContentScale.Fit
+    )
 }
