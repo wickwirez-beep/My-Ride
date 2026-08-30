@@ -206,11 +206,18 @@ private fun ChatBubble(message: ChatMessage) {
                 }
             )
         ) {
-            Text(
-                message.content,
-                modifier = Modifier.padding(12.dp),
-                fontWeight = if (isUser) FontWeight.Medium else FontWeight.Normal
-            )
+            if (isUser) {
+                Text(
+                    message.content,
+                    modifier = Modifier.padding(12.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            } else {
+                MarkdownText(
+                    text = message.content,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
         }
     }
 }

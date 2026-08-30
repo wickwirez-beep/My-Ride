@@ -210,7 +210,7 @@ fun AiMechanicScreen(
                     Spacer(Modifier.height(20.dp))
                     Text("Diagnosis", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
-                    Text(it)
+                    MarkdownText(text = it)
                 }
 
                 Spacer(Modifier.height(16.dp))
