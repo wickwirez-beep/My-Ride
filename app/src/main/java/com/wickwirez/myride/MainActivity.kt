@@ -30,6 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wickwirez.myride.data.OnboardingPrefs
+import com.wickwirez.myride.data.MascotVoice
 import com.wickwirez.myride.data.ReviewPromptManager
 import com.wickwirez.myride.data.VehicleRepository
 import com.wickwirez.myride.ui.AboutScreen
@@ -313,11 +314,14 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 viewModel(factory = FuelLogViewModel.factory(repository, vehicleId))
             val uiState by detailViewModel.uiState.collectAsStateWithLifecycle()
 
+            val fuelLogContext = LocalContext.current
+
             AddFuelLogScreen(
                 vehicleId = vehicleId,
                 currentMileage = uiState.vehicle?.currentMileage ?: 0,
                 onSave = { log ->
                     viewModel.saveLog(log) {
+                        MascotVoice.play(fuelLogContext, MascotVoice.Clip.FILLUP_LOGGED)
                         navController.popBackStack()
                     }
                 },
@@ -420,6 +424,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onSave = { record ->
                     viewModel.saveRecord(record) {
                         ReviewPromptManager.recordSuccessfulAction(context)
+                        MascotVoice.play(context, MascotVoice.Clip.SERVICE_LOGGED)
                         navController.popBackStack()
                     }
                 },
@@ -445,6 +450,7 @@ private fun MyRideNavHost(repository: VehicleRepository) {
                 onSave = { record ->
                     viewModel.saveRecord(record) {
                         ReviewPromptManager.recordSuccessfulAction(context)
+                        MascotVoice.play(context, MascotVoice.Clip.SERVICE_LOGGED)
                         navController.popBackStack()
                     }
                 },

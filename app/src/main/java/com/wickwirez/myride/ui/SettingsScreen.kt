@@ -92,6 +92,7 @@ fun SettingsScreen(
     var backupStatus by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
     var mascotEnabled by remember { mutableStateOf(MascotPrefs.isEnabled(context)) }
+    var mascotVoiceEnabled by remember { mutableStateOf(MascotPrefs.isVoiceEnabled(context)) }
 
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -296,6 +297,31 @@ fun SettingsScreen(
                     onCheckedChange = {
                         mascotEnabled = it
                         MascotPrefs.setEnabled(context, it)
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Wick's Voice", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Let Wick speak up about reminders and logged entries.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Switch(
+                    checked = mascotVoiceEnabled,
+                    enabled = mascotEnabled,
+                    onCheckedChange = {
+                        mascotVoiceEnabled = it
+                        MascotPrefs.setVoiceEnabled(context, it)
                     }
                 )
             }

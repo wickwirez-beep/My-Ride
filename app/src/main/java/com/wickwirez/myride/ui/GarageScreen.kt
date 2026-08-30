@@ -41,6 +41,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import com.wickwirez.myride.data.MascotPrefs
+import com.wickwirez.myride.data.MascotVoice
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.wickwirez.myride.R
@@ -77,7 +78,11 @@ fun GarageScreen(
                 .background(Color(0x99000000))
         )
 
-    if (MascotPrefs.isEnabled(LocalContext.current)) {
+    val mascotContext = LocalContext.current
+    if (MascotPrefs.isEnabled(mascotContext)) {
+        LaunchedEffect(Unit) {
+            MascotVoice.play(mascotContext, MascotVoice.Clip.GREETING)
+        }
         MascotWidget(modifier = Modifier.align(Alignment.BottomStart).zIndex(10f))
     }
 
