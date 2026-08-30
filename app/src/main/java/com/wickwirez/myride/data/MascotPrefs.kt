@@ -9,7 +9,7 @@ object MascotPrefs {
 
     fun isEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_ENABLED, true)
+        return prefs.getBoolean(KEY_ENABLED, false)
     }
 
     fun setEnabled(context: Context, enabled: Boolean) {
@@ -19,7 +19,7 @@ object MascotPrefs {
 
     fun isVoiceEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_VOICE_ENABLED, true)
+        return prefs.getBoolean(KEY_VOICE_ENABLED, false)
     }
 
     fun setVoiceEnabled(context: Context, enabled: Boolean) {
