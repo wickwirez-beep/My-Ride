@@ -46,3 +46,10 @@ object MascotVoice {
         player = null
     }
 }
+
+private val announcedVehicles = mutableSetOf<Long>()
+
+fun playStatusOnce(context: Context, vehicleId: Long, clip: MascotVoice.Clip) {
+    if (!announcedVehicles.add(vehicleId)) return
+    MascotVoice.play(context, clip)
+}
