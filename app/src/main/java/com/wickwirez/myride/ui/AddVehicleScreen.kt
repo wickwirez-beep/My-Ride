@@ -32,6 +32,7 @@ import com.wickwirez.myride.data.CAR_MAKES
 import com.wickwirez.myride.data.MODELS_BY_MAKE
 import com.wickwirez.myride.data.PhotoStorage
 import com.wickwirez.myride.data.VinDecoder
+import com.wickwirez.myride.data.VinValidator
 import com.wickwirez.myride.model.Vehicle
 import kotlinx.coroutines.launch
 
@@ -210,9 +211,16 @@ fun AddVehicleScreen(
                 TextButton(
                     onClick = {
                         decodeError = null
+                        val cleanedVin = VinValidator.clean(vin)
+                        if (cleanedVin != vin) vin = cleanedVin
+                        val problem = VinValidator.problemWith(cleanedVin)
+                        if (problem != null) {
+                            decodeError = problem
+                            return@TextButton
+                        }
                         decoding = true
                         coroutineScope.launch {
-                            val result = VinDecoder.decode(vin.trim())
+                            val result = VinDecoder.decode(cleanedVin)
                             decoding = false
                             if (result != null) {
                                 if (year.isBlank() && result.year != null) year = result.year.toString()
