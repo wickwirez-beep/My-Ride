@@ -24,7 +24,6 @@ fun MarkdownText(
 private fun parseMarkdown(raw: String): AnnotatedString = buildAnnotatedString {
     raw.lines().forEachIndexed { lineIndex, rawLine ->
         if (lineIndex > 0) append("\n")
-
         val headingMatch = Regex("^(#{1,6})\\s+(.*)").find(rawLine)
         if (headingMatch != null) {
             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -32,29 +31,12 @@ private fun parseMarkdown(raw: String): AnnotatedString = buildAnnotatedString {
             }
             return@forEachIndexed
         }
-
-        val bulletMatch = Regex("^\\s*
-cat >> ~/My-Ride/app/src/main/java/com/wickwirez/myride/ui/MarkdownText.kt << 'EOF'
-
-private fun parseMarkdown(raw: String): AnnotatedString = buildAnnotatedString {
-    raw.lines().forEachIndexed { lineIndex, rawLine ->
-        if (lineIndex > 0) append("\n")
-
-        val headingMatch = Regex("^(#{1,6})\\s+(.*)").find(rawLine)
-        if (headingMatch != null) {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                appendInline(headingMatch.groupValues[2])
-            }
-            return@forEachIndexed
-        }
-
         val bulletMatch = Regex("^\\s*[-*\u2022]\\s+(.*)").find(rawLine)
         if (bulletMatch != null) {
             append("  \u2022  ")
             appendInline(bulletMatch.groupValues[1])
             return@forEachIndexed
         }
-
         appendInline(rawLine)
     }
 }
@@ -62,26 +44,17 @@ private fun parseMarkdown(raw: String): AnnotatedString = buildAnnotatedString {
 private fun AnnotatedString.Builder.appendInline(line: String) {
     var index = 0
     val pattern = Regex("\\*\\*(.+?)\\*\\*|__(.+?)__|\\*(.+?)\\*|_(.+?)_")
-
     pattern.findAll(line).forEach { match ->
         if (match.range.first > index) {
             append(line.substring(index, match.range.first))
         }
-
-        val boldText = match.groupValues[1].ifEmpty { match.groupValues[2] }
-        val italicText = match.groupValues[3].ifEmpty { match.groupValues[4] }
-
+        val b = match.groupValues[1].ifEmpty { match.groupValues[2] }
+        val i = match.groupValues[3].ifEmpty { match.groupValues[4] }
         when {
-            boldText.isNotEmpty() ->
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(boldText) }
-            italicText.isNotEmpty() ->
-                withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { append(italicText) }
+            b.isNotEmpty() -> withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(b) }
+            i.isNotEmpty() -> withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { append(i) }
         }
-
         index = match.range.last + 1
     }
-
-    if (index < line.length) {
-        append(line.substring(index))
-    }
+    if (index < line.length) append(line.substring(index))
 }
