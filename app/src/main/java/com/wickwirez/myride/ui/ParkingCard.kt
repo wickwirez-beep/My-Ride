@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -116,6 +117,17 @@ fun ParkingCard(
                     color = Color(0xFFB3B3B3)
                 )
                 Spacer(Modifier.height(12.dp))
+
+                Button(
+                    onClick = { launchFindMyRide(context, parkedLat, parkedLng) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Find My Ride", fontWeight = FontWeight.Bold)
+                }
+                Spacer(Modifier.height(12.dp))
+
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     val tightPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp)
                     Row(
@@ -160,6 +172,18 @@ fun ParkingCard(
 
 private fun openMapsUrl(context: Context, url: String) {
     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+}
+
+private fun launchFindMyRide(context: Context, lat: Double, lng: Double) {
+    val navUri = Uri.parse("google.navigation:q=$lat,$lng&mode=d")
+    val navIntent = Intent(Intent.ACTION_VIEW, navUri).apply {
+        setPackage("com.google.android.apps.maps")
+    }
+    if (navIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(navIntent)
+    } else {
+        openMapsUrl(context, "https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving")
+    }
 }
 
 private fun formatElapsed(parkedAt: Long?): String {
