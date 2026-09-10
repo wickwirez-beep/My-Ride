@@ -207,9 +207,25 @@ fun PhotoServiceRecordScreen(
 
 private fun resizeAndCompressImage(context: android.content.Context, uri: Uri): ByteArray? {
     return try {
-        val input = context.contentResolver.openInputStream(uri) ?: return null
-        val original = input.use { BitmapFactory.decodeStream(it) } ?: return null
         val maxDim = 1600
+
+        val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            BitmapFactory.decodeStream(input, null, boundsOptions)
+        } ?: return null
+
+        var inSampleSize = 1
+        val halfWidth = boundsOptions.outWidth / 2
+        val halfHeight = boundsOptions.outHeight / 2
+        while ((halfWidth / inSampleSize) >= maxDim && (halfHeight / inSampleSize) >= maxDim) {
+            inSampleSize *= 2
+        }
+
+        val decodeOptions = BitmapFactory.Options().apply { this.inSampleSize = inSampleSize }
+        val original = context.contentResolver.openInputStream(uri)?.use { input ->
+            BitmapFactory.decodeStream(input, null, decodeOptions)
+        } ?: return null
+
         val longestSide = maxOf(original.width, original.height)
         val scale = if (longestSide > maxDim) maxDim.toFloat() / longestSide else 1f
         val scaled = if (scale < 1f) {
@@ -217,6 +233,7 @@ private fun resizeAndCompressImage(context: android.content.Context, uri: Uri): 
         } else {
             original
         }
+
         val output = ByteArrayOutputStream()
         scaled.compress(Bitmap.CompressFormat.JPEG, 85, output)
         output.toByteArray()
