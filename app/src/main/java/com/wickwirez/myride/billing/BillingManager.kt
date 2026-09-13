@@ -16,6 +16,8 @@ import com.wickwirez.myride.data.TrialPrefs
 
 class BillingManager(private val context: Context) {
 
+    var onPurchaseUnlocked: (() -> Unit)? = null
+
     companion object {
         const val PRODUCT_ID = "myride_unlock"
     }
@@ -95,6 +97,7 @@ class BillingManager(private val context: Context) {
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             TrialPrefs.setUnlocked(context)
+            onPurchaseUnlocked?.invoke()
 
             if (!purchase.isAcknowledged) {
                 val ackParams = AcknowledgePurchaseParams.newBuilder()
