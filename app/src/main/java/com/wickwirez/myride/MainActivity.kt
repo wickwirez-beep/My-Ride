@@ -29,7 +29,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import android.app.Activity
+import androidx.compose.runtime.LaunchedEffect
+import com.wickwirez.myride.billing.BillingManager
 import com.wickwirez.myride.data.OnboardingPrefs
+import com.wickwirez.myride.data.TrialPrefs
 import com.wickwirez.myride.data.MascotVoice
 import com.wickwirez.myride.data.ReviewPromptManager
 import com.wickwirez.myride.data.VehicleRepository
@@ -55,6 +59,7 @@ import com.wickwirez.myride.ui.GarageScreen
 import com.wickwirez.myride.ui.GarageViewModel
 import com.wickwirez.myride.ui.HelpScreen
 import com.wickwirez.myride.ui.OnboardingScreen
+import com.wickwirez.myride.ui.PaywallScreen
 import com.wickwirez.myride.ui.RecallScreen
 import com.wickwirez.myride.ui.SettingsScreen
 import com.wickwirez.myride.ui.SplashScreen
@@ -71,6 +76,8 @@ class MainActivity : ComponentActivity() {
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    private val billingManager by lazy { BillingManager(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { false }
         super.onCreate(savedInstanceState)
@@ -80,19 +87,25 @@ class MainActivity : ComponentActivity() {
         }
 
         val repository = (application as MyRideApplication).repository
+        billingManager.startConnection()
 
         setContent {
             MyRideTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MyRideNavHost(repository)
+                    MyRideNavHost(repository, billingManager)
                 }
             }
         }
     }
+
+    override fun onDestroy() {
+        billingManager.endConnection()
+        super.onDestroy()
+    }
 }
 
 @Composable
-private fun MyRideNavHost(repository: VehicleRepository) {
+private fun MyRideNavHost(repository: VehicleRepository, billingManager: BillingManager) {
     val navController: NavHostController = rememberNavController()
 
     NavHost(
@@ -119,7 +132,11 @@ private fun MyRideNavHost(repository: VehicleRepository) {
             val context = LocalContext.current
             SplashScreen(
                 onFinished = {
-                    val destination = if (OnboardingPrefs.hasSeenOnboarding(context)) "garage" else "onboarding"
+                    val destination = when {
+                        !TrialPrefs.hasAccess(context) -> "paywall"
+                        OnboardingPrefs.hasSeenOnboarding(context) -> "garage"
+                        else -> "onboarding"
+                    }
                     navController.navigate(destination) {
                         popUpTo("splash") { inclusive = true }
                     }
@@ -142,6 +159,27 @@ private fun MyRideNavHost(repository: VehicleRepository) {
         composable("onboarding_replay") {
             OnboardingScreen(
                 onFinished = { navController.popBackStack() }
+            )
+        }
+
+        composable("paywall") {
+            val context = LocalContext.current
+            val activity = context as? Activity
+
+            fun proceedPastPaywall() {
+                val destination = if (OnboardingPrefs.hasSeenOnboarding(context)) "garage" else "onboarding"
+                navController.navigate(destination) {
+                    popUpTo("paywall") { inclusive = true }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                billingManager.onPurchaseUnlocked = { proceedPastPaywall() }
+            }
+
+            PaywallScreen(
+                onPurchaseClick = { activity?.let { billingManager.launchPurchaseFlow(it) } },
+                onPromoRedeemed = { proceedPastPaywall() }
             )
         }
 
