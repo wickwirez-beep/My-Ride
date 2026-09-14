@@ -8,7 +8,7 @@ object TrialPrefs {
     private const val KEY_FIRST_LAUNCH = "first_launch_time"
     private const val KEY_UNLOCKED = "is_unlocked"
 
-    private val TRIAL_DURATION_MILLIS = TimeUnit.SECONDS.toMillis(10)
+    private val TRIAL_DURATION_MILLIS = TimeUnit.DAYS.toMillis(3)
 
     private fun getOrSetFirstLaunchTime(context: Context): Long {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
