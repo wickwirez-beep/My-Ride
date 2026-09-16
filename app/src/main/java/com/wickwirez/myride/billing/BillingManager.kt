@@ -76,7 +76,7 @@ class BillingManager(private val context: Context) {
                     .setProductDetailsParamsList(productDetailsParamsList)
                     .build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
-            }
+            } else { android.widget.Toast.makeText(activity, "Purchase unavailable (lookup failed)", android.widget.Toast.LENGTH_LONG).show() }
         }
     }
 
