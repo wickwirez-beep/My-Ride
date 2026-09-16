@@ -45,7 +45,7 @@ class BillingManager(private val context: Context) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     onReady()
                     queryExistingPurchases()
-                }
+                } else { android.widget.Toast.makeText(context, "Billing setup failed: " + billingResult.responseCode, android.widget.Toast.LENGTH_LONG).show() }
             }
 
             override fun onBillingServiceDisconnected() {
