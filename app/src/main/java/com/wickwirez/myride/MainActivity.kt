@@ -164,7 +164,7 @@ private fun MyRideNavHost(repository: VehicleRepository, billingManager: Billing
 
         composable("paywall") {
             val context = LocalContext.current
-            val activity = context as? Activity
+            val activity = generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }.filterIsInstance<Activity>().firstOrNull()
 
             fun proceedPastPaywall() {
                 val destination = if (OnboardingPrefs.hasSeenOnboarding(context)) "garage" else "onboarding"
