@@ -36,6 +36,7 @@ fun PaywallScreen(
     var isChecking by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    val ctx = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold { innerPadding ->
         Column(
@@ -61,7 +62,7 @@ fun PaywallScreen(
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = onPurchaseClick,
+                onClick = { android.widget.Toast.makeText(ctx, "tap received", android.widget.Toast.LENGTH_SHORT).show(); onPurchaseClick() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Unlock for \$2.99")
