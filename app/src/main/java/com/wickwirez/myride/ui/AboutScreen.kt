@@ -64,6 +64,8 @@ fun AboutScreen(onBack: () -> Unit) {
             Text("My Ride", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text("Version ${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})", style = MaterialTheme.typography.bodyMedium)
+            val trialCtx = LocalContext.current
+            Text(if (com.wickwirez.myride.data.TrialPrefs.isUnlocked(trialCtx)) "Unlocked — full version" else "Free trial: " + com.wickwirez.myride.data.TrialPrefs.daysRemainingInTrial(trialCtx) + " day(s) remaining", style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.height(24.dp))
             Text(
                 "Complete vehicle maintenance and expense tracker.",
